@@ -98,6 +98,23 @@ const AddUser = () => {
     })
   }
 
+  const selectAllSports = () => {
+    setSelectedSports(sportsList.map(s => Number(s.sportId)));
+  };
+
+  const unselectAllSports = () => {
+    setSelectedSports([]);
+  };
+
+  const selectAllCasinos = () => {
+    setSelectedCasinos(casinoList.map(c => Number(c.match_id)));
+  };
+
+  const unselectAllCasinos = () => {
+    setSelectedCasinos([]);
+  };
+
+
 
 
 
@@ -179,7 +196,7 @@ const AddUser = () => {
       });
 
       data.userSetting = userSettingArr;
-  
+
     }
 
     // ✅ ONLY SUPER ADMIN → betLock fields allowed
@@ -187,13 +204,13 @@ const AddUser = () => {
       delete data.betLock;
       delete data.betLock2;
     }
-    
+
 
 
     // Parent Name
     data.parent = userData?.username;
-      data.Allowsport = selectedSports;
-      data.AllowCasino= selectedCasinos;
+    data.Allowsport = selectedSports;
+    data.AllowCasino = selectedCasinos;
 
     // Removing keys
     delete data.maxbet;
@@ -760,9 +777,17 @@ const AddUser = () => {
                     </table>
                   </div>
                 </div>
-               {userState.user.role == "admin"&&(<> <div className="row m-t-20">
+                {userState.user.role == "admin" && (<> <div className="row m-t-20">
                   <div className="col-md-12">
                     <h4 className="m-b-20">Sports Access</h4>
+
+                    <div className="d-flex gap-3 mb-2">
+
+                      <button type="button" className="btn btn-sm btn-danger" onClick={unselectAllSports}>
+                        Unselect All
+                      </button>
+                    </div>
+
 
                     <div className="row">
                       {sportsList.map((sport, index) => {
@@ -791,46 +816,56 @@ const AddUser = () => {
                     </div>
                   </div>
                 </div>
-                <div className="row m-t-20">
-                  <div className="col-md-12">
-                    <h4 className="m-b-20">Casino Access</h4>
+                  <div className="row m-t-20">
+                    <div className="col-md-12">
+                      <h4 className="m-b-20">Casino Access</h4>
 
-                    <div className="row">
-                      {casinoList.map((casino) => {
-                        const casinoId = Number(casino.match_id);
+                      <div className="d-flex gap-3 mb-2">
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-danger"
+                          onClick={unselectAllCasinos}
+                        >
+                          Unselect All
+                        </button>
+                      </div>
 
-                        return (
-                          <div className="col-md-3" key={casinoId}>
-                            <div className="form-check">
-                              <input
-                                id={`casino-${casinoId}`}
-                                type="checkbox"
-                                className="form-check-input"
-                                checked={selectedCasinos.includes(casinoId)}
-                                onChange={(e) => {
-                                  console.log('casino clicked:', casinoId, e.target.checked);
-                                  toggleSelection(
-                                    casinoId,
-                                    e.target.checked,
-                                    setSelectedCasinos
-                                  );
-                                }}
-                              />
+                      <div className="row">
+                        {casinoList.map((casino) => {
+                          const casinoId = Number(casino.match_id);
 
-                              <label
-                                className="form-check-label"
-                                htmlFor={`casino-${casinoId}`}
-                              >
-                                {casino.title}
-                              </label>
+                          return (
+                            <div className="col-md-3" key={casinoId}>
+                              <div className="form-check">
+                                <input
+                                  id={`casino-${casinoId}`}
+                                  type="checkbox"
+                                  className="form-check-input"
+                                  checked={selectedCasinos.includes(casinoId)}
+                                  onChange={(e) => {
+                                    console.log('casino clicked:', casinoId, e.target.checked);
+                                    toggleSelection(
+                                      casinoId,
+                                      e.target.checked,
+                                      setSelectedCasinos
+                                    );
+                                  }}
+                                />
+
+                                <label
+                                  className="form-check-label"
+                                  htmlFor={`casino-${casinoId}`}
+                                >
+                                  {casino.title}
+                                </label>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
 
+                      </div>
                     </div>
-                  </div>
-                </div></>)}
+                  </div></>)}
 
 
                 <div className='row m-t-20'>

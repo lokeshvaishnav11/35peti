@@ -837,7 +837,7 @@ style={{position: "fixed",
 
     {/* 🎰 OTHERS / CASINO */}
     <Section title="Others" defaultOpen>
-      <Item label="Our Casino" />jkl
+      <Item label="Our Casino" />
       <Item label="Our VIP Casino" />
       <Item label="Our Premium Casino" />
       <Item label="Our Virtual" />
