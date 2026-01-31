@@ -464,7 +464,7 @@ export class BetController extends ApiController {
           if (exposer != 'failed') {
             let available_balance = userBlance && userBlance.balance ? userBlance.balance : -exposer
             if (available_balance && available_balance < parseInt(exposer)) {
-              return this.fail(res, ' Max limit Exceed.')
+              return this.fail(res, ' Insuffiecint Balance.')
             }
             await bet.save(function (err) {
               if (err) throw err
@@ -502,7 +502,7 @@ export class BetController extends ApiController {
             let available_balance =
               userBlance && userBlance.balance ? userBlance.balance : -casinoexposer
             if (available_balance && available_balance < parseInt(casinoexposer)) {
-              return this.fail(res, ' Max limit Exceed.')
+              return this.fail(res, ' Insuffiecint Balance.')
             }
             await bet.save(function (err) {
               if (err) throw err

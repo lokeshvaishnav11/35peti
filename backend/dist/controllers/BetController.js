@@ -433,7 +433,7 @@ class BetController extends ApiController_1.ApiController {
                         if (exposer != 'failed') {
                             let available_balance = userBlance && userBlance.balance ? userBlance.balance : -exposer;
                             if (available_balance && available_balance < parseInt(exposer)) {
-                                return this.fail(res, ' Max limit Exceed.');
+                                return this.fail(res, ' Insuffiecint Balance.');
                             }
                             yield bet.save(function (err) {
                                 if (err)
@@ -464,7 +464,7 @@ class BetController extends ApiController_1.ApiController {
                         if (casinoexposer != 'failed') {
                             let available_balance = userBlance && userBlance.balance ? userBlance.balance : -casinoexposer;
                             if (available_balance && available_balance < parseInt(casinoexposer)) {
-                                return this.fail(res, ' Max limit Exceed.');
+                                return this.fail(res, ' Insuffiecint Balance.');
                             }
                             yield bet.save(function (err) {
                                 if (err)

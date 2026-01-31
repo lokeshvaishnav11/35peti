@@ -17,7 +17,7 @@ const WithdrawModal = (props: any) => {
       .required('Amount is required')
       .transform((value) => (isNaN(value) ? 0 : +value))
       .min(1, 'Amount is required')
-      .max(props.userDetails?.balance?.balance, `Max ${props.userDetails?.balance?.balance} limit`),
+      .max(props.userDetails?.balance?.balance, `Insufficient ${props.userDetails?.balance?.balance} Balance`),
   })
 
   const {

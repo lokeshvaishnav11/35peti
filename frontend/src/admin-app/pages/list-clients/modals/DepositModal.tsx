@@ -25,7 +25,7 @@ const DepositModal = (props: any) => {
           .min(1, 'Amount is required')
           .max(
             props.depositUser?.parentBalance?.balance,
-            `Max ${props.depositUser?.parentBalance?.balance} limit`,
+            `Insufficient ${props.depositUser?.parentBalance?.balance} Balance`,
           ),
   })
 

@@ -238,7 +238,7 @@ export class DealersController extends ApiController {
   async getUserList(req: Request, res: Response): Promise<Response> {
     const { username, page, search, type, status } = req.query
     const pageNo = page ? (page as string) : '1'
-    const pageLimit = 20
+    const pageLimit = 9999
 
     const currentUser: any = req.user
 
