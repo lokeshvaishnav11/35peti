@@ -148,12 +148,16 @@ const fetchBookMakerDataFromApi = async (EventID: any, sportId: any) => {
 const GetsessionFromApi = async (MatchId: any, sportId: any) => {
   try {
     const res = await axios.get(`http://130.250.191.174:3009/getPriveteData?gmid=${MatchId}&sid=${sportId}&key=dijbfuwd719e12rqhfbjdqdnkqnd11eqdqd`);
-    console.log(res?.data?.data, "fancy data Lokesh")
+    // console.log(res?.data?.data, "fancy data Lokesh")
     const fancyData: any = res?.data?.data
-      ?.filter((p: any) =>
-        p.gtype != p.gtype.includes('match') // fixed logical condition
-        // p.marketType !== "BOOKMAKER" // uncomment if needed
-      )
+      ?.filter((p: any) => {
+        const gtype = (p.gtype || "").toLowerCase();
+
+        return (
+          !gtype.includes("match") &&
+          !gtype.includes("cricketcasino")
+        );
+      })
       ?.flatMap((f: any) =>
         (f.section || []).map((fa: any) => ({
           matchId: MatchId,
@@ -162,10 +166,11 @@ const GetsessionFromApi = async (MatchId: any, sportId: any) => {
           ballbyBall: "",
           RunnerName: fa.nat,
           gtype: f.gtype,
-          sportId: sportId, // now uses passed value instead of hardcoded 4
+          sportId: sportId,
           sr_no: f.sno,
         }))
       );
+
 
     return fancyData;
   } catch (error) {
@@ -284,7 +289,7 @@ class OddsController {
       response = response ? { data: JSON.parse(response) } : { data: [] };
       const market = response.data
         .filter((m: any) => m.SelectionId == SelectionId)
-        // .filter((m: any) => m.gtype === "session" || m.gtype === "fancy1");
+      // .filter((m: any) => m.gtype === "session" || m.gtype === "fancy1");
 
       // /  console.log(market,"markets hahahahh")
 
