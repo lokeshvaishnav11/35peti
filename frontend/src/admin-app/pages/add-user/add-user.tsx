@@ -102,6 +102,10 @@ const AddUser = () => {
     setSelectedSports(sportsList.map(s => Number(s.sportId)));
   };
 
+  const isAllSelected =
+  selectedSports.length === sportsList.length && sportsList.length > 0
+
+
   const unselectAllSports = () => {
     setSelectedSports([]);
   };
@@ -110,9 +114,14 @@ const AddUser = () => {
     setSelectedCasinos(casinoList.map(c => Number(c.match_id)));
   };
 
+  const isAllCasinosSelected =
+  selectedCasinos.length === casinoList.length && casinoList.length > 0
+
+
   const unselectAllCasinos = () => {
     setSelectedCasinos([]);
   };
+
 
 
 
@@ -783,10 +792,28 @@ const AddUser = () => {
 
                     <div className="d-flex gap-3 mb-2">
 
-                      <button type="button" className="btn btn-sm btn-danger" onClick={unselectAllSports}>
-                        Unselect All
-                      </button>
-                    </div>
+{!isAllSelected && (
+  <button
+    type="button"
+    className="btn btn-sm btn-success"
+    onClick={selectAllSports}
+  >
+    Select All
+  </button>
+)}
+
+{isAllSelected && (
+  <button
+    type="button"
+    className="btn btn-sm btn-danger"
+    onClick={unselectAllSports}
+  >
+    Unselect All
+  </button>
+)}
+
+</div>
+
 
 
                     <div className="row">
@@ -821,14 +848,29 @@ const AddUser = () => {
                       <h4 className="m-b-20">Casino Access</h4>
 
                       <div className="d-flex gap-3 mb-2">
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-danger"
-                          onClick={unselectAllCasinos}
-                        >
-                          Unselect All
-                        </button>
-                      </div>
+
+{!isAllCasinosSelected && (
+  <button
+    type="button"
+    className="btn btn-sm btn-success"
+    onClick={selectAllCasinos}
+  >
+    Select All
+  </button>
+)}
+
+{isAllCasinosSelected && (
+  <button
+    type="button"
+    className="btn btn-sm btn-danger"
+    onClick={unselectAllCasinos}
+  >
+    Unselect All
+  </button>
+)}
+
+</div>
+
 
                       <div className="row">
                         {casinoList.map((casino) => {

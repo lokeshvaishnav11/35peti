@@ -137,6 +137,8 @@ const AdminBetListComponent = ({
     <>
       <div className='table-responsive'>
 
+       <p className='fs-1'>Details</p>
+
       {sendInfo?.allBets?.length > 0 && (
   <div className='d-flex mt-3 mb-5 justify-content-between'>
     <div>
