@@ -377,6 +377,7 @@ import sportsService from '../../../services/sports.service'
 import casinoService from '../../../services/casino.service'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import AdminBetListComponent from '../UnsetteleBetHistory/admin-bet-list-component'
 
 
 const AccountStatementAdmin = () => {
@@ -551,6 +552,7 @@ const AccountStatementAdmin = () => {
         balance: a.closing,
         from: a.stmt.txnBy,
         remark: a.narration,
+        allBets: a.stmt.allBets || [],
       },
     }))
 
@@ -621,8 +623,15 @@ const AccountStatementAdmin = () => {
     setfilterdata((prev: any) => ({ ...prev, userId: user._id, username: user.username }))
   }
 
+
+  React.useEffect(() => {
+    if (isOpen) getBetsData(selectedStmt, pageBet)
+  }, [selectedStmt, pageBet, isOpen])
+
+
   /* Bets */
   const getBetsData = (stmt: AccoutStatement, pageNumber: number) => {
+    console.log(stmt, "stmt222")
     const betIds: any = stmt?.allBets?.map(({ betId }: any) => betId)
     if (betIds?.length) {
       betService.getBetListByIds(betIds, pageNumber).then((res: AxiosResponse) => {
@@ -633,7 +642,11 @@ const AccountStatementAdmin = () => {
     }
   }
 
+      
+
   const getBets = (e: MouseEvent<HTMLTableCellElement>, stmt: AccoutStatement) => {
+    console.log(stmt, "stmt")
+
     e.preventDefault()
     setSelectedStmt(stmt)
     setPageBet(1)
@@ -654,7 +667,7 @@ const AccountStatementAdmin = () => {
             <td className='green wnwrap'>{stmt.credit}</td>
             <td className='red wnwrap'>{stmt.debit}</td>
             <td className='green wnwrap'>{stmt.closing}</td>
-            <td>{stmt.stmt.txnBy}</td>
+            <td>{stmt?.stmt?.txnBy}</td>
             <td onClick={(e) => getBets(e, stmt.stmt)}>
               <span className={stmt.type === 'pnl' ? 'label-button' : ''}>
                 {stmt.narration}
@@ -672,12 +685,17 @@ const AccountStatementAdmin = () => {
       currentItems.map((item: any, index: number) => (
         <tr key={index}>
           <td>{index + 1}</td>
-          <td className="wnwrap">{item.row.date}</td>
-          <td className="green wnwrap">{item.row.credit}</td>
-          <td className="red wnwrap">{item.row.debit}</td>
-          <td className="green wnwrap">{item.row.balance}</td>
-          <td>{item.row.from}</td>
-          <td>{item.row.remark}</td>
+          <td className="wnwrap">{item?.row?.date}</td>
+          <td className="green wnwrap">{item?.row?.credit}</td>
+          <td className="red wnwrap">{item?.row?.debit}</td>
+          <td className="green wnwrap">{item?.row?.balance}</td>
+          <td>{item?.row?.from}</td>
+          {/* <td>{item?.row?.remark}</td> */}
+          <td onClick={(e) => getBets(e, item.row)}>
+              <span className={item?.row?.type === 'pnl' ? 'label-button' : ''}>
+                {item?.row?.remark}
+              </span>
+            </td>
         </tr>
       ))
     )
@@ -812,11 +830,12 @@ const AccountStatementAdmin = () => {
       </div>
 
       <ReactModal isOpen={isOpen} onRequestClose={() => setIsOpen(false)} ariaHideApp={false}>
-        <BetListComponent
+        <AdminBetListComponent
           bethistory={betHistory}
           handlePageClick={(e: any) => getBetsData(selectedStmt, e.selected + 1)}
           page={pageBet}
           isTrash={false}
+          sendInfo={selectedStmt}
         />
       </ReactModal>
     </>
