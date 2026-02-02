@@ -323,7 +323,7 @@ const Header = () => {
                     <a>
                       <b>Transactions</b> <i className='fa fa-caret-down' />
                     </a>
-                    <ul className='dropdown-menu' aria-labelledby='navbarDropdownMenuLink'>
+                    <ul className='dropdown-menu' aria-labelledby='navbarDropdownMenuLink' >
                       <li>
                         <CustomLink to='/depositstatement' className='dropdown-item'>
                           <b>{"Deposit"}</b>

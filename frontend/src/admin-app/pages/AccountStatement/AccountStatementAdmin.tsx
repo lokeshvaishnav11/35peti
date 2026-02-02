@@ -384,7 +384,7 @@ const AccountStatementAdmin = () => {
   const [closeBalance, setCloseBalance] = React.useState(0)
   const [currentItems, setCurrentItems] = React.useState<any[]>([])
   const [itemOffset, setItemOffset] = React.useState(0)
-  const [itemsPerPage] = React.useState(50)
+  const [itemsPerPage] = React.useState(500)
   const [pageCount, setPageCount] = React.useState(0)
 
   const [isOpen, setIsOpen] = React.useState(false)
@@ -394,13 +394,20 @@ const AccountStatementAdmin = () => {
 
   const [openBalance, setOpenBalance] = React.useState(0)
 
+  const [operations, setOperations] = React.useState<any[]>([])
+const [mergedList, setMergedList] = React.useState<any[]>([])
+
+
   const [filterdata, setfilterdata] = React.useState<any>({
     startDate: '',
     endDate: '',
     reportType: 'ALL',
     userId: '',
     gameId: '',
+    username:''
   })
+
+  console.log(filterdata,"")
 
   const [page, setPage] = React.useState(1)
   const [pageBet, setPageBet] = React.useState(1)
@@ -466,42 +473,90 @@ const AccountStatementAdmin = () => {
     })
   }
 
+    /* Form Handlers */
+    const handleformchange = (event: any) => {
+      const { name, value } = event.target
+      setfilterdata((prev: any) => ({
+        ...prev,
+        [name]: value,
+        ...(name === 'reportType' ? { gameId: '' } : {}),
+      }))
+    }
+  
+    const handleGameChange = (e: any) => {
+      setfilterdata((prev: any) => ({
+        ...prev,
+        gameId: e.target.value,
+      }))
+    }
+
+  const mergeAccountAndOperation = (accounts: any[], operations: any[]) => {
+    const accMapped = accounts.map((a) => ({
+      type: 'ACCOUNT',
+      date: new Date(a.stmt.createdAt),
+      row: {
+        date: a.date,
+        credit: a.amount > 0 ? a.amount : '',
+        debit: a.amount < 0 ? Math.abs(a.amount) : '',
+        balance: a.closing,
+        from: a.stmt.txnBy,
+        remark: a.narration,
+      },
+    }))
+  
+    const opMapped = operations.map((o) => ({
+      type: 'OPERATION',
+      date: new Date(o.date),
+      row: {
+        date: moment(o.date).format(dateFormat),
+        credit: "--",
+        debit: "--",
+        balance: o.operation,
+        from: o.doneBy,
+        remark: o.description,
+      },
+    }))
+  
+    return [...accMapped, ...opMapped]
+      .sort((a, b) => b.date.getTime() - a.date.getTime())
+  }
+  
+
+
   /* API */
-  const getAccountStmt = (page: number) => {
-    accountService
-      .getAccountList(page, filterdata)
-      .then((res) => {
-        if (res?.data?.data) setAccountStmt(res?.data?.data?.items || [])
-        if (res?.data?.data?.items && page === 0)
-          setOpenBalance(res?.data?.data?.openingBalance || 0)
-
-        setparseAccountStmt(
-          dataformat(
-            res?.data?.data?.items || [],
-            res?.data?.data?.openingBalance || 0,
-          ),
-        )
-        setPage(page)
-      })
-      .catch(() => toast.error('error'))
+  const getAccountStmt = async (page: number) => {
+    try {
+      const res = await accountService.getAccountList(page, filterdata)
+  
+      const items = res?.data?.data?.items || []
+      const openingBalance = res?.data?.data?.openingBalance || 0
+  
+      setOpenBalance(openingBalance)
+  
+      const formattedAccount = dataformat(items, openingBalance)
+  
+      // 🔥 Operation API call (username required)
+      let operationData: any[] = []
+      if (filterdata?.username) {
+        const username = filterdata?.username
+  
+        const opRes = await betService.postsettelement2({ username })
+        operationData = opRes?.data?.data?.operations || []
+      }
+  
+      const merged = mergeAccountAndOperation(formattedAccount, operationData)
+  
+      setMergedList(merged)
+      setparseAccountStmt(merged)
+      setPage(page)
+  
+    } catch (err) {
+      toast.error('Error loading data')
+    }
   }
+  
 
-  /* Form Handlers */
-  const handleformchange = (event: any) => {
-    const { name, value } = event.target
-    setfilterdata((prev: any) => ({
-      ...prev,
-      [name]: value,
-      ...(name === 'reportType' ? { gameId: '' } : {}),
-    }))
-  }
 
-  const handleGameChange = (e: any) => {
-    setfilterdata((prev: any) => ({
-      ...prev,
-      gameId: e.target.value,
-    }))
-  }
 
   const handleSubmitform = (event: any) => {
     event.preventDefault()
@@ -513,7 +568,7 @@ const AccountStatementAdmin = () => {
   }
 
   const onSelectUser = (user: any) => {
-    setfilterdata((prev: any) => ({ ...prev, userId: user._id }))
+    setfilterdata((prev: any) => ({ ...prev, userId: user._id , username:user.username }))
   }
 
   /* Bets */
@@ -536,7 +591,7 @@ const AccountStatementAdmin = () => {
   }
 
   /* Table HTML */
-  const getAcHtml = () => {
+  const getAcHtmlold = () => {
     let closingbalance: number = page === 1 ? openBalance : closeBalance
     return (
       currentItems &&
@@ -560,6 +615,24 @@ const AccountStatementAdmin = () => {
       })
     )
   }
+
+  const getAcHtml = () => {
+    return (
+      currentItems &&
+      currentItems.map((item: any, index: number) => (
+        <tr key={index}>
+          <td>{index + 1}</td>
+          <td className="wnwrap">{item.row.date}</td>
+          <td className="green wnwrap">{item.row.credit}</td>
+          <td className="red wnwrap">{item.row.debit}</td>
+          <td className="green wnwrap">{item.row.balance}</td>
+          <td>{item.row.from}</td>
+          <td>{item.row.remark}</td>
+        </tr>
+      ))
+    )
+  }
+  
 
   return (
     <>
@@ -651,8 +724,8 @@ const AccountStatementAdmin = () => {
                       <th>Date</th>
                       <th>Credit</th>
                       <th>Debit</th>
-                      <th>Balance</th>
-                      <th>From</th>
+                      <th>Balance/Operation</th>
+                      <th>From/Done By</th>
                       <th>Remark</th>
                     </tr>
                   </thead>
