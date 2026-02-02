@@ -137,12 +137,19 @@ const AdminBetListComponent = ({
     <>
       <div className='table-responsive'>
 
-        <div className='d-flex mt-3 mb-5 justify-content-between '>
-        <div>{sendInfo?.remark} - {sendInfo?.allBets[0]?.result[0]?.marketName}</div>
-       <div>Game Time:{moment(sendInfo?.allBets[0]?.createdAt).format(
-              'YYYY-MM-DD HH:mm:ss',
-            )}</div>
-        </div>
+      {sendInfo?.allBets?.length > 0 && (
+  <div className='d-flex mt-3 mb-5 justify-content-between'>
+    <div>
+      {sendInfo?.remark} - {sendInfo?.allBets[0]?.result?.[0]?.marketName}
+    </div>
+
+    <div>
+      Game Time:{' '}
+      {moment(sendInfo?.allBets[0]?.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+    </div>
+  </div>
+)}
+
      
 
 
