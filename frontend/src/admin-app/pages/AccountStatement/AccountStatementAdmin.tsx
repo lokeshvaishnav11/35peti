@@ -314,7 +314,7 @@
 //               />
 //             </div>
 
-           
+
 
 
 
@@ -375,6 +375,9 @@ import { useAppSelector } from '../../../redux/hooks'
 import { selectLoader } from '../../../redux/actions/common/commonSlice'
 import sportsService from '../../../services/sports.service'
 import casinoService from '../../../services/casino.service'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+
 
 const AccountStatementAdmin = () => {
   const loadingState = useAppSelector(selectLoader)
@@ -395,7 +398,7 @@ const AccountStatementAdmin = () => {
   const [openBalance, setOpenBalance] = React.useState(0)
 
   const [operations, setOperations] = React.useState<any[]>([])
-const [mergedList, setMergedList] = React.useState<any[]>([])
+  const [mergedList, setMergedList] = React.useState<any[]>([])
 
 
   const [filterdata, setfilterdata] = React.useState<any>({
@@ -404,10 +407,10 @@ const [mergedList, setMergedList] = React.useState<any[]>([])
     reportType: 'ALL',
     userId: '',
     gameId: '',
-    username:''
+    username: ''
   })
 
-  console.log(filterdata,"")
+  console.log(filterdata, "")
 
   const [page, setPage] = React.useState(1)
   const [pageBet, setPageBet] = React.useState(1)
@@ -473,22 +476,69 @@ const [mergedList, setMergedList] = React.useState<any[]>([])
     })
   }
 
-    /* Form Handlers */
-    const handleformchange = (event: any) => {
-      const { name, value } = event.target
-      setfilterdata((prev: any) => ({
-        ...prev,
-        [name]: value,
-        ...(name === 'reportType' ? { gameId: '' } : {}),
-      }))
-    }
-  
-    const handleGameChange = (e: any) => {
-      setfilterdata((prev: any) => ({
-        ...prev,
-        gameId: e.target.value,
-      }))
-    }
+  const downloadPDF = () => {
+    const doc = new jsPDF('p', 'mm', 'a4')
+
+    doc.setFontSize(14)
+    doc.text('Account Statement', 14, 15)
+
+    doc.setFontSize(10)
+    doc.text(
+      `User: ${filterdata.username || 'All'} | From: ${filterdata.startDate} To: ${filterdata.endDate}`,
+      14,
+      22
+    )
+
+    const tableColumn = [
+      'Date',
+      'Credit',
+      'Debit',
+      'Balance / Operation',
+      'From / Done By',
+      'Remark',
+    ]
+
+    const tableRows: any[] = []
+
+    mergedList.forEach((item: any) => {
+      tableRows.push([
+        item.row.date,
+        item.row.credit || '',
+        item.row.debit || '',
+        item.row.balance || '',
+        item.row.from || '',
+        item.row.remark || '',
+      ])
+    })
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 28,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [22, 160, 133] },
+    })
+
+    doc.save(`Account_Statement_${filterdata.username || 'all'}.pdf`)
+  }
+
+
+  /* Form Handlers */
+  const handleformchange = (event: any) => {
+    const { name, value } = event.target
+    setfilterdata((prev: any) => ({
+      ...prev,
+      [name]: value,
+      ...(name === 'reportType' ? { gameId: '' } : {}),
+    }))
+  }
+
+  const handleGameChange = (e: any) => {
+    setfilterdata((prev: any) => ({
+      ...prev,
+      gameId: e.target.value,
+    }))
+  }
 
   const mergeAccountAndOperation = (accounts: any[], operations: any[]) => {
     const accMapped = accounts.map((a) => ({
@@ -503,7 +553,7 @@ const [mergedList, setMergedList] = React.useState<any[]>([])
         remark: a.narration,
       },
     }))
-  
+
     const opMapped = operations.map((o) => ({
       type: 'OPERATION',
       date: new Date(o.date),
@@ -516,45 +566,45 @@ const [mergedList, setMergedList] = React.useState<any[]>([])
         remark: o.description,
       },
     }))
-  
+
     return [...accMapped, ...opMapped]
       .sort((a, b) => b.date.getTime() - a.date.getTime())
   }
-  
+
 
 
   /* API */
   const getAccountStmt = async (page: number) => {
     try {
       const res = await accountService.getAccountList(page, filterdata)
-  
+
       const items = res?.data?.data?.items || []
       const openingBalance = res?.data?.data?.openingBalance || 0
-  
+
       setOpenBalance(openingBalance)
-  
+
       const formattedAccount = dataformat(items, openingBalance)
-  
+
       // 🔥 Operation API call (username required)
       let operationData: any[] = []
       if (filterdata?.username) {
         const username = filterdata?.username
-  
+
         const opRes = await betService.postsettelement2({ username })
         operationData = opRes?.data?.data?.operations || []
       }
-  
+
       const merged = mergeAccountAndOperation(formattedAccount, operationData)
-  
+
       setMergedList(merged)
       setparseAccountStmt(merged)
       setPage(page)
-  
+
     } catch (err) {
       toast.error('Error loading data')
     }
   }
-  
+
 
 
 
@@ -568,7 +618,7 @@ const [mergedList, setMergedList] = React.useState<any[]>([])
   }
 
   const onSelectUser = (user: any) => {
-    setfilterdata((prev: any) => ({ ...prev, userId: user._id , username:user.username }))
+    setfilterdata((prev: any) => ({ ...prev, userId: user._id, username: user.username }))
   }
 
   /* Bets */
@@ -632,7 +682,7 @@ const [mergedList, setMergedList] = React.useState<any[]>([])
       ))
     )
   }
-  
+
 
   return (
     <>
@@ -713,7 +763,20 @@ const [mergedList, setMergedList] = React.useState<any[]>([])
                   </div>
                 </div>
               </form>
+               <div className='col-12 col-lg-2 mbc-5'>
+              <label className='label'>&nbsp;</label>
+              <button
+                type='button'
+                className='btn btn-success btn-block'
+                onClick={downloadPDF}
+              >
+                Download PDF
+              </button>
             </div>
+            </div>
+
+           
+
 
             <div className='card-body'>
               <div className='table-responsive'>
