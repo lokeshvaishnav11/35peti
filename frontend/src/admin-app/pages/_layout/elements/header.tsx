@@ -271,6 +271,14 @@ const Header = () => {
                       <b>Market Analysis</b>
                     </CustomLink>
                   </li>
+                   <li className='nav-item'>
+                    <CustomLink to={'/txn'}>
+                      <b>Txn</b>
+                    </CustomLink>
+                  </li>
+
+
+
                   <li className='nav-item dropdown'>
                     <a>
                       <b>Reports</b> <i className='fa fa-caret-down' />
@@ -410,11 +418,11 @@ const Header = () => {
                       </>
                       )}
 
-                      {/* <li>
+                      <li>
                         <CustomLink to='/payment-method' className='dropdown-item'>
                           <b>{'Payment Method'}</b>
                         </CustomLink>
-                      </li> */}
+                      </li>
 
                       {/* <li>
                         <CustomLink to='/update-whatsapp' className='dropdown-item'>

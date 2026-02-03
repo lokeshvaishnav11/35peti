@@ -184,6 +184,9 @@ const WithdrawStatement = () => {
                       <th className='bg2 text-white' style={{ width: '10%', textAlign: 'center' }}>
                         Details
                       </th>
+                      {/* <th className='bg2 text-white' style={{ width: '10%', textAlign: 'center' }}>
+                        UTR
+                      </th> */}
                       <th className='bg2 text-white' style={{ width: '10%', textAlign: 'center' }}>
                         Approved By
                       </th>
@@ -221,6 +224,8 @@ const WithdrawStatement = () => {
                               View
                             </button>
                           </td>
+                          {/* <td style={{ textAlign: 'center' }}>{item.utrno}</td> */}
+
                           <td></td>
                           <td style={{ textAlign: 'center' }}>{item.accountType}</td>
                           <td style={{ textAlign: 'center' }}>{item.amount}</td>

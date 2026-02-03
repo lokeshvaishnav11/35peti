@@ -5,6 +5,7 @@ import { selectUserData } from '../redux/actions/login/loginSlice'
 import Login2 from '../pages/login/login2'
 import UpdateWhatsapp from './pages/settings/UpdateWhatsapp'
 import DeletedBetsUndo from './pages/UnsetteleBetHistory/DeletedBetsUndo'
+import Txn from './pages/transaction-statement/Txn'
 const OperationAdmin = React.lazy(() => import('../admin-app/pages/AccountStatement/Operation'))
 
 // import ClientLedger from './pages/settings/ClientLedger'
@@ -97,6 +98,8 @@ const AdminRoutes = () => {
             { path: 'assign-agent', element: <AssignAgent /> },
             { path: 'multi-login', element: <MultiLogin/> },
             { path: 'secure-auth', element: <SecureAuth/> },
+            { path: 'txn', element: <Txn/> },
+
 
 
 
