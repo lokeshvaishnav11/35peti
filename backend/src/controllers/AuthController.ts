@@ -236,7 +236,7 @@ export class AuthController extends ApiController {
       const userData: any = await User.findOne({ _id: user._id });
       // Verify current password
     const isMatch = await userData.comparePassword(current_password);
-    if (!isMatch) {
+    if (isMatch) {
       return res.status(400).json({
         message: 'Current Password not matched',
         errors: { current_password: 'Current Password not matched' }

@@ -13,6 +13,8 @@ import { useAppDispatch, useAppSelector } from '../../../../redux/hooks'
 import casinoService from '../../../../services/casino.service'
 import sportsService from '../../../../services/sports.service'
 import userService from '../../../../services/user.service'
+import UserService from '../../../../services/user.service'
+
 import CustomAutoComplete from '../../../components/CustomAutoComplete'
 import Marqueemessge from './welcome'
 import { DataNode } from 'antd/es/tree'
@@ -46,6 +48,9 @@ const Header = () => {
   const [showMenu, setShowMenu] = React.useState<boolean>(false)
   const [treeData, setTreeData] = React.useState<any>([])
   const [expanded, setExpanded] = React.useState<string[]>([])
+const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]: any }>(
+    {}
+  );
 
   const [expandedKeys, setExpandedKeys] = React.useState<any[]>([])
 
@@ -69,6 +74,24 @@ const Header = () => {
         setGameList(res.data.data)
       })
   }, [])
+
+
+  React.useEffect(() => {
+    // const userState = useAppSelector<{ user: User }>(selectUserData);
+    const username:any = userState?.user?.username;
+
+    console.log(username, "testagentmaster");
+    UserService.getParentUserDetail(username).then(
+      (res: AxiosResponse<any>) => {
+        console.log(res, "check balance for parent");
+        const detail = res?.data.data[0];
+        setUserParentAlldata(detail);
+
+      }
+    );
+  }, [userState]);
+
+  
 
   const toggleDrawer = () => {
     setIsOpen((prev) => !prev)
@@ -271,11 +294,12 @@ const Header = () => {
                       <b>Market Analysis</b>
                     </CustomLink>
                   </li>
-                   <li className='nav-item'>
+                  {   (userState?.user?.role == "admin" ||
+  userParentAlldata?.paymode == "manual") && <li className='nav-item'>
                     <CustomLink to={'/txn'}>
                       <b>Txn</b>
                     </CustomLink>
-                  </li>
+                  </li>}
 
 
 
@@ -327,7 +351,8 @@ const Header = () => {
                     </ul>
                   </li>
 
-                  <li className='nav-item dropdown'>
+                 { (userState?.user?.role == "admin" ||
+  userParentAlldata?.paymode == "manual") && <li className='nav-item dropdown'>
                     <a>
                       <b>Transactions</b> <i className='fa fa-caret-down' />
                     </a>
@@ -343,7 +368,7 @@ const Header = () => {
                         </CustomLink>
                       </li>
                     </ul>
-                  </li>
+                  </li>}
                   <li className='nav-item dropdown'>
                     <a>
                       <b>Live Markets</b> <i className='fa fa-caret-down' />
@@ -418,11 +443,12 @@ const Header = () => {
                       </>
                       )}
 
-                      <li>
+                     {(userState?.user?.role === "admin" ||
+  userParentAlldata?.paymode === "manual") && <li>
                         <CustomLink to='/payment-method' className='dropdown-item'>
                           <b>{'Payment Method'}</b>
                         </CustomLink>
-                      </li>
+                      </li>}
 
                       <li>
                         <CustomLink to='/update-tv' className='dropdown-item'>
