@@ -20,6 +20,7 @@ const MatchSchema = new mongoose_1.Schema({
     matchId: { type: Number, index: true },
     sportId: { type: Number, index: true },
     seriesId: { type: Number, index: true },
+    seriesName: { type: String },
     matchDateTime: Date,
     active: { type: Boolean, index: true },
     isDelete: { type: Boolean, index: true, default: false },

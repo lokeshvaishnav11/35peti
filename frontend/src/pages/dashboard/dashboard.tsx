@@ -24,6 +24,7 @@ import {
 } from '../../redux/actions/casino/casinoSlice'
 import Fav from '../_layout/elements/fav'
 import axios from 'axios'
+import RacingMatchList from './elements/racing-list'
 
 const Dashboard = () => {
   const [matchList, setMatchList] = React.useState<LMatch[]>([])
@@ -40,7 +41,7 @@ const Dashboard = () => {
   React.useEffect(() => {
     sportsServices.getMatchList(sportId, status).then((res: AxiosResponse<any>) => {
       const oddsData = { ...odds }
-      console.log(res.data,'data from sport list')
+      console.log(res.data, 'data from sport list')
       marketIdsEvent(res.data.data, oddsData, 'joinMarketRoom')
       setOdds(oddsData)
       setMatchList(res.data.data)
@@ -219,7 +220,7 @@ const Dashboard = () => {
   )
 
   const marketIdsEvent = (data: any, oddsData: any, event: string) => {
-    console.log(data,oddsData,event ,"market Event Data")
+    console.log(data, oddsData, event, "market Event Data")
     data.map((match: IMatch) => {
       match.markets?.map((market) => {
         if (market.marketName == 'Match Odds' && !odds[market.marketId]) {
@@ -251,21 +252,30 @@ const Dashboard = () => {
         <div className='tab-content'>
           <div className='tab-pane active'>
             <div className='matchlist coupon-card-first'>
-              {!isMobile ? (
-                <MatchList currentMatch={currentMatch} memoOdds={memoOdds} matchList={matchList} />
-              ) : (
-                <MatchListMobile
-                  currentMatch={currentMatch}
-                  memoOdds={memoOdds}
-                  matchList={matchList}
-                />
+              {(sportId === "10" || sportId === "65") && (
+                <RacingMatchList matchList={matchList} />
+              )}
+              {sportId !== "10" && sportId !== "65" && (
+                !isMobile ? (
+                  <MatchList
+                    currentMatch={currentMatch}
+                    memoOdds={memoOdds}
+                    matchList={matchList}
+                  />
+                ) : (
+                  <MatchListMobile
+                    currentMatch={currentMatch}
+                    memoOdds={memoOdds}
+                    matchList={matchList}
+                  />
+                )
               )}
               {location.pathname.includes('in-play') || !isMobile ? (
                 <div className='home-page'>
-                <div className='casino-list mt-2' style={{marginLeft:!isMobile?"-6px":""}}>
-                  {/* <div className='section-title'>Live Casino</div> */}
-                  <CasinoListItem />
-                </div>
+                  <div className='casino-list mt-2' style={{ marginLeft: !isMobile ? "-6px" : "" }}>
+                    {/* <div className='section-title'>Live Casino</div> */}
+                    <CasinoListItem />
+                  </div>
                 </div>
               ) : (
                 ''

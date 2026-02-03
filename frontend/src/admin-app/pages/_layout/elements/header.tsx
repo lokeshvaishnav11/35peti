@@ -424,11 +424,11 @@ const Header = () => {
                         </CustomLink>
                       </li>
 
-                      {/* <li>
-                        <CustomLink to='/update-whatsapp' className='dropdown-item'>
-                          <b>{'Update Whatsapp'}</b>
+                      <li>
+                        <CustomLink to='/update-tv' className='dropdown-item'>
+                          <b>{'Mange -TV'}</b>
                         </CustomLink>
-                      </li> */}
+                      </li>
 
 
 

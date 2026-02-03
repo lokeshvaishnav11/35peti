@@ -42,64 +42,64 @@ class SportsController extends ApiController {
   // }
 
   async getSportList(req: Request, res: Response): Promise<Response> {
-  try {
-    // @ts-ignore
-    const userId = req.user._id
-    console.log(userId,"ghjk")
+    try {
+      // @ts-ignore
+      const userId = req.user._id
+      console.log(userId, "ghjk")
 
-    // 1️⃣ current user
-    const user: any = await User.findById(userId, {
-      Allowsport: 1,
-      parentStr: 1,
-    }).lean()
-
-    if (!user) {
-      return this.fail(res, 'User not found')
-    }
-
-    let allowSportIds: number[] = []
-
-    // 2️⃣ agar user ka AllowSport empty nahi
-    if (Array.isArray(user.Allowsport) && user.Allowsport.length > 0) {
-      allowSportIds = user.Allowsport.map(Number)
-    }
-
-    // 3️⃣ agar empty hai → parent ke AllowSport lo
-    else if (Array.isArray(user.parentStr) && user.parentStr.length > 1) {
-      const parentId = user.parentStr[1]
-
-      const parentUser: any = await User.findById(parentId, {
-        AllowSport: 1,
+      // 1️⃣ current user
+      const user: any = await User.findById(userId, {
+        Allowsport: 1,
+        parentStr: 1,
       }).lean()
 
-      console.log(parentUser,"hjKL")
-
-      if (
-        parentUser &&
-        Array.isArray(parentUser.AllowSport) &&
-        parentUser.AllowSport.length > 0
-      ) {
-        allowSportIds = parentUser.AllowSport.map(Number)
+      if (!user) {
+        return this.fail(res, 'User not found')
       }
+
+      let allowSportIds: number[] = []
+
+      // 2️⃣ agar user ka AllowSport empty nahi
+      if (Array.isArray(user.Allowsport) && user.Allowsport.length > 0) {
+        allowSportIds = user.Allowsport.map(Number)
+      }
+
+      // 3️⃣ agar empty hai → parent ke AllowSport lo
+      else if (Array.isArray(user.parentStr) && user.parentStr.length > 1) {
+        const parentId = user.parentStr[1]
+
+        const parentUser: any = await User.findById(parentId, {
+          AllowSport: 1,
+        }).lean()
+
+        console.log(parentUser, "hjKL")
+
+        if (
+          parentUser &&
+          Array.isArray(parentUser.AllowSport) &&
+          parentUser.AllowSport.length > 0
+        ) {
+          allowSportIds = parentUser.AllowSport.map(Number)
+        }
+      }
+
+      // 4️⃣ final sport query
+      let sportFilter: any = {}
+      console.log(allowSportIds, "GHJK")
+      if (allowSportIds.length > 0) {
+        sportFilter = { sportId: { $in: allowSportIds } }
+      }
+
+      // 5️⃣ sports fetch
+      const sports = await Sport.find(sportFilter).lean()
+
+      return this.success(res, sports)
+
+    } catch (e: any) {
+      console.error(e)
+      return this.fail(res, e)
     }
-
-    // 4️⃣ final sport query
-    let sportFilter: any = {}
-   console.log(allowSportIds,"GHJK")
-    if (allowSportIds.length > 0) {
-      sportFilter = { sportId: { $in: allowSportIds } }
-    }
-
-    // 5️⃣ sports fetch
-    const sports = await Sport.find(sportFilter).lean()
-
-    return this.success(res, sports)
-
-  } catch (e: any) {
-    console.error(e)
-    return this.fail(res, e)
   }
-}
 
 
   async saveSeries(req: Request, res: Response): Promise<Response> {
@@ -134,6 +134,7 @@ class SportsController extends ApiController {
             sportId: 1,
             seriesId: 1,
             name: 1,
+            seriesName:1,
             _id: 0,
           })
           .lean()
@@ -156,6 +157,9 @@ class SportsController extends ApiController {
         .catch((e: any) => {
           console.log(e.response)
         })
+
+
+        console.log(matchData,"matchData")
 
       await matchData.map(async (match: any) => {
         await this.marketesData(match, syncData)
@@ -191,6 +195,8 @@ class SportsController extends ApiController {
           isBookMaker,
           isT10: isT10 || isT10Fancy,
         }
+
+        saveMatchData.seriesName = match?.series?.name
 
         if (!syncData) {
           saveMatchData = { ...saveMatchData, ...sportSettings }
@@ -1156,28 +1162,62 @@ class SportsController extends ApiController {
       // .catch((e) => console.log('error', e))
       const response = await axios.get(`http://130.250.191.174:3009/esid?sid=${EventTypeID}&key=dijbfuwd719e12rqhfbjdqdnkqnd11eqdqd`)
         .then(async (series: any) => {
-          console.log(series, "series from api");
+          // console.log(series, "series from api");
 
-          const getMatches = series?.data?.data?.t1?.flatMap((s: any) => {
-            return {
-              event: {
-                id: s.gmid,
+          if (EventTypeID == "10" || EventTypeID == "65") {
+
+            console.log("hello world")
+
+            var getMatches =
+              series?.data?.data?.t1?.flatMap((s: any) =>
+                (s.children || []).flatMap((c: any) =>
+                  (c.children || []).map((cc: any) => ({
+                    event: {
+                      id: cc.gmid,
+                      name: c.ename,
+                      timezone: "GMT",
+                      openDate: cc.stime,
+                    },
+                    series: {
+                      id: s.cid.toString(),
+                      name: s.cname,
+                    },
+                    matchId: cc.gmid,
+                    matchDateTime: cc.stime,
+                    name: c.ename,
+                    seriesId: s.cid.toString(),
+                    sportId: EventTypeID,
+                    active: matchIds.includes(parseInt(cc.gmid)),
+                  }))
+                )
+              ) || [];
+
+          }
+
+          else {
+
+            var getMatches = series?.data?.data?.t1?.flatMap((s: any) => {
+              return {
+                event: {
+                  id: s.gmid,
+                  name: s.ename,
+                  timezone: "GMT",
+                  openDate: s.stime,
+                },
+                series: {
+                  id: s.cid.toString(),
+                  name: s.cname,
+                },
+                matchId: s.gmid,
+                matchDateTime: s.stime,
                 name: s.ename,
-                timezone: "GMT",
-                openDate: s.stime,
-              },
-              series: {
-                id: s.cid.toString(),
-                name: s.cname,
-              },
-              matchId: s.gmid,
-              matchDateTime: s.stime,
-              name: s.ename,
-              seriesId: s.cid.toString(),
-              sportId: EventTypeID,
-              active: matchIds.includes(parseInt(s.gmid)),
-            }
-          }) || [];
+                seriesId: s.cid.toString(),
+                sportId: EventTypeID,
+                active: matchIds.includes(parseInt(s.gmid)),
+              }
+            }) || [];
+
+          }
 
           return Promise.all([...getMatches]);
         })
@@ -1188,7 +1228,7 @@ class SportsController extends ApiController {
           console.log('error', e);
           return [];
         });
-      console.log(response, "response is here")
+      // console.log(response, "response is here")
 
       return this.success(res, response, '')
     } catch (e: any) {
@@ -1444,7 +1484,7 @@ class SportsController extends ApiController {
   //       });
 
   //       return competitionMap.values();
-        
+
   //     };
   //     const response = parseCompetitionWiseMatches(responseone.data);
   //     console.log(response, "response is here with date")
@@ -1456,76 +1496,76 @@ class SportsController extends ApiController {
   // }
 
   getSeriesWithMarketWithDate = async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { EventTypeID } = req.query;
-    if (!EventTypeID) {
-      return this.fail(res, 'EventTypeID is required field');
-    }
-
-    const responseone = await axios.get(
-      `http://130.250.191.174:3009/esid?sid=${EventTypeID}&key=dijbfuwd719e12rqhfbjdqdnkqnd11eqdqd`
-    );
-
-    const parseCompetitionWiseMatches = (apiResponse: any) => {
-      if (!apiResponse?.success || !apiResponse?.data?.t1) {
-        return [];
+    try {
+      const { EventTypeID } = req.query;
+      if (!EventTypeID) {
+        return this.fail(res, 'EventTypeID is required field');
       }
 
-      const allMatches = apiResponse.data.t1;
-      const competitionMap = new Map<string, any>();
+      const responseone = await axios.get(
+        `http://130.250.191.174:3009/esid?sid=${EventTypeID}&key=dijbfuwd719e12rqhfbjdqdnkqnd11eqdqd`
+      );
 
-      allMatches.forEach((match: any) => {
-        // ✅ required filters
-        if ((match?.gtype || '').toLowerCase() !== 'match') return;
-        if (match?.mname !== 'MATCH_ODDS') return;
-
-        const competitionId = String(match.cid);
-        const competitionName = match.cname || '';
-
-        // ✅ create bucket
-        if (!competitionMap.has(competitionId)) {
-          competitionMap.set(competitionId, {
-            competition: {
-              id: competitionId,
-              name: competitionName,
-            },
-            marketCount: 0,
-            competitionRegion: competitionName.toLowerCase().includes('india')
-              ? 'IND'
-              : 'International',
-            matches: [],
-          });
+      const parseCompetitionWiseMatches = (apiResponse: any) => {
+        if (!apiResponse?.success || !apiResponse?.data?.t1) {
+          return [];
         }
 
-        const competitionObj = competitionMap.get(competitionId);
+        const allMatches = apiResponse.data.t1;
+        const competitionMap = new Map<string, any>();
 
-        // ✅ increment market count
-        competitionObj.marketCount += 1;
+        allMatches.forEach((match: any) => {
+          // ✅ required filters
+          if ((match?.gtype || '').toLowerCase() !== 'match') return;
+          if (match?.mname !== 'MATCH_ODDS') return;
 
-        // ✅ push match
-        competitionObj.matches.push({
-          event: {
-            id: match.gmid || match.mid,
-            name: match.ename,
-            timezone: 'GMT',
-            openDate: new Date(match.stime).toISOString(),
-          },
-          marketCount: '',
+          const competitionId = String(match.cid);
+          const competitionName = match.cname || '';
+
+          // ✅ create bucket
+          if (!competitionMap.has(competitionId)) {
+            competitionMap.set(competitionId, {
+              competition: {
+                id: competitionId,
+                name: competitionName,
+              },
+              marketCount: 0,
+              competitionRegion: competitionName.toLowerCase().includes('india')
+                ? 'IND'
+                : 'International',
+              matches: [],
+            });
+          }
+
+          const competitionObj = competitionMap.get(competitionId);
+
+          // ✅ increment market count
+          competitionObj.marketCount += 1;
+
+          // ✅ push match
+          competitionObj.matches.push({
+            event: {
+              id: match.gmid || match.mid,
+              name: match.ename,
+              timezone: 'GMT',
+              openDate: new Date(match.stime).toISOString(),
+            },
+            marketCount: '',
+          });
         });
-      });
 
-      // ❌ iterator nahi
-      // ✅ pure array return
-      return Array.from(competitionMap.values());
-    };
+        // ❌ iterator nahi
+        // ✅ pure array return
+        return Array.from(competitionMap.values());
+      };
 
-    const response = parseCompetitionWiseMatches(responseone.data);
+      const response = parseCompetitionWiseMatches(responseone.data);
 
-    return this.success(res, response, '');
-  } catch (e: any) {
-    return this.fail(res, e?.message || e);
-  }
-};
+      return this.success(res, response, '');
+    } catch (e: any) {
+      return this.fail(res, e?.message || e);
+    }
+  };
 
 
   inplayMarket = async (req: Request, res: Response): Promise<any> => {

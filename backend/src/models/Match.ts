@@ -29,6 +29,7 @@ interface IMatch {
   offPlayFancyMaxLimit?: number
   offPlayBookMinLimit?: number
   offPlayBookMaxLimit?: number
+  seriesName?:string
 }
 
 interface IMatchModel extends IMatchSetting, Document {}
@@ -38,6 +39,7 @@ const MatchSchema = new Schema(
     matchId: { type: Number, index: true },
     sportId: { type: Number, index: true },
     seriesId: { type: Number, index: true },
+    seriesName:{type:String},
     matchDateTime: Date,
     active: { type: Boolean, index: true },
     isDelete: { type: Boolean, index: true, default: false },

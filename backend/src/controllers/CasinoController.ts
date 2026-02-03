@@ -1917,8 +1917,11 @@ export class CasinoController extends ApiController {
   htmlCards = async (req: Request, res: Response) => {
     const { type, roundId } = req.params
     try {
-      let casinoType: any = await CasinoGameResult.findOne({ mid: roundId })
-      const html = casinoType?.data?.html
+      // let casinoType: any = await CasinoGameResult.findOne({ mid: roundId })
+      const resultApi = await axios.get(`http://69.62.123.205:3000/detailresult2/${type}/${roundId}`)
+      console.log(resultApi,"CGHJK")
+      
+      const html = resultApi?.data?.data.t1
       return this.success(res, { html })
     } catch (e: any) {
       return this.fail(res, e.stack)

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import { User, IUserModel } from '../models/User'
+import { User } from '../models/User'
 import Locals from '../providers/Locals'
 import { ApiController } from './ApiController'
 import bcrypt from 'bcrypt-nodejs'
@@ -8,6 +8,11 @@ import { RoleType } from '../models/Role'
 import { checkMaintenance } from '../util/maintenance'
 import { UserLog } from '../models/UserLog'
 import Operation from '../models/Operation'
+import { Types,ObjectId } from 'mongoose'
+import { IUser } from '../models/User';
+
+
+
 
 export class AuthController extends ApiController {
   constructor() {
@@ -158,8 +163,23 @@ export class AuthController extends ApiController {
   }
 
   async getUser(req: Request, res: Response): Promise<Response> {
+    // const username:any = req.user.username;
+    // const userData = await User.findOne({username})
     return this.success(res, { user: req.user })
   }
+
+//  async getUser(req: Request, res: Response): Promise<Response> {
+//   const userData = await User
+//     .findOne(Types.ObjectId(req.user._id))
+//     .select('-password');
+
+//   if (!userData) {
+//     return res.status(404).json({ message: 'User not found' });
+//   }
+
+//   return this.success(res, { user: userData });
+// }
+
 
   async refreshToken(req: Request, res: Response): Promise<Response> {
     const { token } = req.body

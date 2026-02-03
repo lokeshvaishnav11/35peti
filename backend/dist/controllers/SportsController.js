@@ -262,28 +262,51 @@ class SportsController extends ApiController_1.ApiController {
                 // .catch((e) => console.log('error', e))
                 const response = yield axios_1.default.get(`http://130.250.191.174:3009/esid?sid=${EventTypeID}&key=dijbfuwd719e12rqhfbjdqdnkqnd11eqdqd`)
                     .then((series) => __awaiter(this, void 0, void 0, function* () {
-                    var _b, _c, _d;
-                    console.log(series, "series from api");
-                    const getMatches = ((_d = (_c = (_b = series === null || series === void 0 ? void 0 : series.data) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c.t1) === null || _d === void 0 ? void 0 : _d.flatMap((s) => {
-                        return {
+                    // console.log(series, "series from api");
+                    var _b, _c, _d, _e, _f, _g;
+                    if (EventTypeID == "10" || EventTypeID == "65") {
+                        console.log("hello world");
+                        var getMatches = ((_d = (_c = (_b = series === null || series === void 0 ? void 0 : series.data) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c.t1) === null || _d === void 0 ? void 0 : _d.flatMap((s) => (s.children || []).flatMap((c) => (c.children || []).map((cc) => ({
                             event: {
-                                id: s.gmid,
-                                name: s.ename,
+                                id: cc.gmid,
+                                name: c.ename,
                                 timezone: "GMT",
-                                openDate: s.stime,
+                                openDate: cc.stime,
                             },
                             series: {
                                 id: s.cid.toString(),
                                 name: s.cname,
                             },
-                            matchId: s.gmid,
-                            matchDateTime: s.stime,
-                            name: s.ename,
+                            matchId: cc.gmid,
+                            matchDateTime: cc.stime,
+                            name: c.ename,
                             seriesId: s.cid.toString(),
                             sportId: EventTypeID,
-                            active: matchIds.includes(parseInt(s.gmid)),
-                        };
-                    })) || [];
+                            active: matchIds.includes(parseInt(cc.gmid)),
+                        }))))) || [];
+                    }
+                    else {
+                        var getMatches = ((_g = (_f = (_e = series === null || series === void 0 ? void 0 : series.data) === null || _e === void 0 ? void 0 : _e.data) === null || _f === void 0 ? void 0 : _f.t1) === null || _g === void 0 ? void 0 : _g.flatMap((s) => {
+                            return {
+                                event: {
+                                    id: s.gmid,
+                                    name: s.ename,
+                                    timezone: "GMT",
+                                    openDate: s.stime,
+                                },
+                                series: {
+                                    id: s.cid.toString(),
+                                    name: s.cname,
+                                },
+                                matchId: s.gmid,
+                                matchDateTime: s.stime,
+                                name: s.ename,
+                                seriesId: s.cid.toString(),
+                                sportId: EventTypeID,
+                                active: matchIds.includes(parseInt(s.gmid)),
+                            };
+                        })) || [];
+                    }
                     return Promise.all([...getMatches]);
                 }))
                     .then((matches) => {
@@ -293,7 +316,7 @@ class SportsController extends ApiController_1.ApiController {
                     console.log('error', e);
                     return [];
                 });
-                console.log(response, "response is here");
+                // console.log(response, "response is here")
                 return this.success(res, response, '');
             }
             catch (e) {
@@ -717,6 +740,7 @@ class SportsController extends ApiController_1.ApiController {
                         sportId: 1,
                         seriesId: 1,
                         name: 1,
+                        seriesName: 1,
                         _id: 0,
                     })
                         .lean();
@@ -734,7 +758,9 @@ class SportsController extends ApiController_1.ApiController {
                     .catch((e) => {
                     console.log(e.response);
                 });
+                console.log(matchData, "matchData");
                 yield matchData.map((match) => __awaiter(this, void 0, void 0, function* () {
+                    var _a;
                     yield this.marketesData(match, syncData);
                     const isFancy = yield this.fancyData(match);
                     const isBookMaker = yield this.bookmakermarketesData(match);
@@ -764,6 +790,7 @@ class SportsController extends ApiController_1.ApiController {
                     if (sportSettings === null || sportSettings === void 0 ? void 0 : sportSettings._id)
                         sportSettings === null || sportSettings === void 0 ? true : delete sportSettings._id;
                     let saveMatchData = Object.assign(Object.assign({}, match), { isFancy: isT10Fancy || isFancy, isBookMaker, isT10: isT10 || isT10Fancy });
+                    saveMatchData.seriesName = (_a = match === null || match === void 0 ? void 0 : match.series) === null || _a === void 0 ? void 0 : _a.name;
                     if (!syncData) {
                         saveMatchData = Object.assign(Object.assign({}, saveMatchData), sportSettings);
                     }

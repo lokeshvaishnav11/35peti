@@ -6,6 +6,7 @@ import Login2 from '../pages/login/login2'
 import UpdateWhatsapp from './pages/settings/UpdateWhatsapp'
 import DeletedBetsUndo from './pages/UnsetteleBetHistory/DeletedBetsUndo'
 import Txn from './pages/transaction-statement/Txn'
+import TvSettings from '../pages/Updatetv/updatetv'
 const OperationAdmin = React.lazy(() => import('../admin-app/pages/AccountStatement/Operation'))
 
 // import ClientLedger from './pages/settings/ClientLedger'
@@ -116,7 +117,7 @@ const AdminRoutes = () => {
             { path: 'update-whatsapp', element: <UpdateWhatsapp /> },
             { path: "deleted-bets", element: <DeletedBetsUndo /> },
             { path: "login-reports", element: <OperationAdmin /> },
-
+             {path: 'update-tv',element:<TvSettings/>}
 
             // { path: "client-ledger", element: <ClientLedger/>}
 

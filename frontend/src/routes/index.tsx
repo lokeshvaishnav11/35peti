@@ -11,6 +11,8 @@ import Login2 from '../pages/login/login2'
 import TOS from '../pages/withdrawstatement/TOS'
 import RG from '../pages/withdrawstatement/RG'
 import AviatorList from '../pages/CasinoList/AviatorList'
+import { element } from 'prop-types'
+import TvSettings from '../pages/Updatetv/updatetv'
 
 const AccountStatement = React.lazy(() => import('../pages/AccountStatement/AccountStatement'))
 const BetHistory = React.lazy(() => import('../pages/BetHistory/BetHistory'))
@@ -94,6 +96,7 @@ const Routers = () => {
             { path: '/terms-and-conditions', element: <TOS /> },
             { path: '/responsible-gaming', element: <RG /> },
             { path: '/aviator-list', element: <AviatorList /> },
+          
 
 
 

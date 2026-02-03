@@ -219,9 +219,20 @@ class AuthController extends ApiController_1.ApiController {
     }
     getUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            // const username:any = req.user.username;
+            // const userData = await User.findOne({username})
             return this.success(res, { user: req.user });
         });
     }
+    //  async getUser(req: Request, res: Response): Promise<Response> {
+    //   const userData = await User
+    //     .findOne(Types.ObjectId(req.user._id))
+    //     .select('-password');
+    //   if (!userData) {
+    //     return res.status(404).json({ message: 'User not found' });
+    //   }
+    //   return this.success(res, { user: userData });
+    // }
     refreshToken(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { token } = req.body;
