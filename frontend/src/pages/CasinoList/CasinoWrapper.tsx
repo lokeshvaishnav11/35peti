@@ -125,7 +125,7 @@ const CasinoWrapper = (props: any) => {
    React.useEffect(() => {
     async function getUrl() {
       const res = await betService.tvStatus()
-      console.log(res.data.ctv, 'url 1')
+      // console.log(res.data.ctv, 'url 1')
       setctv(prev => (res.data.ctv));
     }
     getUrl();
@@ -501,7 +501,7 @@ const CasinoWrapper = (props: any) => {
                       width='100%'
                       height='420'
                       style={{ border: '0px' }}
-                      src={ctv  ?`https://casino-stream-v2.cricketid.xyz/casino-tv?id=${gameCode}`:""}
+                      src={`https://casino-stream-v2.cricketid.xyz/casino-tv?id=${gameCode}`}
 
                     />
                   )}
@@ -604,7 +604,7 @@ const CasinoWrapper = (props: any) => {
                       background: '#000',
                     }}
                   >
-                    {liveMatchData && ctv &&(
+                    {liveMatchData &&(
                       <iframe
                         title='stream'
                         width='100%'
