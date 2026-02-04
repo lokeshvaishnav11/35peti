@@ -35,20 +35,20 @@ const Header = () => {
         setShowMenu(false)
       }
     }
-  
+
     document.addEventListener('mousedown', handleClickOutside)
-  
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
-  
+
 
 
   const [showMenu, setShowMenu] = React.useState<boolean>(false)
   const [treeData, setTreeData] = React.useState<any>([])
   const [expanded, setExpanded] = React.useState<string[]>([])
-const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]: any }>(
+  const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]: any }>(
     {}
   );
 
@@ -78,7 +78,7 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
 
   React.useEffect(() => {
     // const userState = useAppSelector<{ user: User }>(selectUserData);
-    const username:any = userState?.user?.username;
+    const username: any = userState?.user?.username;
 
     console.log(username, "testagentmaster");
     UserService.getParentUserDetail(username).then(
@@ -91,11 +91,11 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
     );
   }, [userState]);
 
-  
+
 
   const toggleDrawer = () => {
     setIsOpen((prev) => !prev)
-  
+
     setTreeData(
       sportsList.sports.map((sport: ISport) => ({
         key: sport.sportId,
@@ -123,7 +123,7 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
       }))
     )
   }
-  
+
 
   const logoutUser = (e: any) => {
     e.preventDefault()
@@ -166,88 +166,88 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
       return node
     })
 
-    const onLoadData = (node: any) => {
-      // already loaded
-      if (node.children) {
-        return Promise.resolve()
-      }
-    
-      // MATCH click
-      if (node.type === 'match') {
-        setIsOpen(false)
-        window.location.href = `/admin/odds/${node.matchId}`
-        return Promise.resolve()
-      }
-    
-      // SPORT → SERIES
-      if (node.type === 'sport') {
-        return sportsService.getSeriesWithMatch(node.key).then((res: any) => {
-          const seriesNodes: DataNode[] = res.data.data.map((series: any) => {
-            const seriesKey = `series-${series.competition.id}`
-    
-            return {
-              key: seriesKey,
-              type: 'series',
-              sportId: node.key,
-              competitionId: series.competition.id,
-              isLeaf: false,
-              children: undefined,
-              title: (
-                <div className="d-flex align-items-center tree-row">
-                  <span
-                    className="plus-box"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setExpandedKeys((prev) =>
-                        prev.includes(seriesKey)
-                          ? prev.filter((k) => k !== seriesKey)
-                          : [...prev, seriesKey]
-                      )
-                    }}
-                  >
-                    {expandedKeys.includes(seriesKey) ? '-' : '+'}
-                  </span>
-                  <span>{series.competition.name}</span>
-                </div>
-              ),
-            }
-          })
-    
-          setTreeData((origin: any) =>
-            updateTreeData(origin, node.key, seriesNodes)
-          )
-    
-          return seriesNodes
-        })
-      }
-    
-      // SERIES → MATCHES
-      if (node.type === 'series') {
-        return sportsService.getSeriesWithMatch(node.sportId).then((res: any) => {
-          const series = res.data.data.find(
-            (s: any) => s.competition.id === node.competitionId
-          )
-    
-          const matchNodes: DataNode[] =
-            series?.matches?.map((match: any) => ({
-              key: `match-${match.event.id}`,
-              title: match.event.name,
-              type: 'match',
-              matchId: match.event.id,
-              isLeaf: true,
-            })) || []
-    
-          setTreeData((origin: any) =>
-            updateTreeData(origin, node.key, matchNodes)
-          )
-    
-          return matchNodes
-        })
-      }
-    
+  const onLoadData = (node: any) => {
+    // already loaded
+    if (node.children) {
       return Promise.resolve()
     }
-    
+
+    // MATCH click
+    if (node.type === 'match') {
+      setIsOpen(false)
+      window.location.href = `/admin/odds/${node.matchId}`
+      return Promise.resolve()
+    }
+
+    // SPORT → SERIES
+    if (node.type === 'sport') {
+      return sportsService.getSeriesWithMatch(node.key).then((res: any) => {
+        const seriesNodes: DataNode[] = res.data.data.map((series: any) => {
+          const seriesKey = `series-${series.competition.id}`
+
+          return {
+            key: seriesKey,
+            type: 'series',
+            sportId: node.key,
+            competitionId: series.competition.id,
+            isLeaf: false,
+            children: undefined,
+            title: (
+              <div className="d-flex align-items-center tree-row">
+                <span
+                  className="plus-box"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setExpandedKeys((prev) =>
+                      prev.includes(seriesKey)
+                        ? prev.filter((k) => k !== seriesKey)
+                        : [...prev, seriesKey]
+                    )
+                  }}
+                >
+                  {expandedKeys.includes(seriesKey) ? '-' : '+'}
+                </span>
+                <span>{series.competition.name}</span>
+              </div>
+            ),
+          }
+        })
+
+        setTreeData((origin: any) =>
+          updateTreeData(origin, node.key, seriesNodes)
+        )
+
+        return seriesNodes
+      })
+    }
+
+    // SERIES → MATCHES
+    if (node.type === 'series') {
+      return sportsService.getSeriesWithMatch(node.sportId).then((res: any) => {
+        const series = res.data.data.find(
+          (s: any) => s.competition.id === node.competitionId
+        )
+
+        const matchNodes: DataNode[] =
+          series?.matches?.map((match: any) => ({
+            key: `match-${match.event.id}`,
+            title: match.event.name,
+            type: 'match',
+            matchId: match.event.id,
+            isLeaf: true,
+          })) || []
+
+        setTreeData((origin: any) =>
+          updateTreeData(origin, node.key, matchNodes)
+        )
+
+        return matchNodes
+      })
+    }
+
+    return Promise.resolve()
+  }
+
 
   return (
     <>
@@ -265,13 +265,15 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
             <nav className='navbar navbar-expand-md btco-hover-menu'>
               <div className='collapse navbar-collapse'>
                 <ul className='list-unstyled navbar-nav'
-                
-                style={{width: "73%",
-                  textWrap: "nowrap",
-                  flexWrap: "wrap",
-                  rowGap: "14px",}}>
 
-                {/* <li className='nav-item'>
+                  style={{
+                    width: "73%",
+                    textWrap: "nowrap",
+                    flexWrap: "wrap",
+                    rowGap: "14px",
+                  }}>
+
+                  {/* <li className='nav-item'>
                     <CustomLink to={`/combined-dashboard`}>
                       <b>Dashboard</b>
                     </CustomLink>
@@ -294,12 +296,12 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
                       <b>Market Analysis</b>
                     </CustomLink>
                   </li>
-                  {   (userState?.user?.role == "admin" ||
-  userParentAlldata?.paymode == "manual") && <li className='nav-item'>
-                    <CustomLink to={'/txn'}>
-                      <b>Txn</b>
-                    </CustomLink>
-                  </li>}
+                  {(userState?.user?.role == "admin" ||
+                    userParentAlldata?.paymode == "manual") && <li className='nav-item'>
+                      <CustomLink to={'/txn'}>
+                        <b>Auto</b>
+                      </CustomLink>
+                    </li>}
 
 
 
@@ -326,7 +328,7 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
                         </li>
                       )}
 
-{userState?.user?.role === RoleType.admin && (
+                      {userState?.user?.role === RoleType.admin && (
                         <li>
                           <CustomLink to='/deleted-bets' className='dropdown-item'>
                             <b>Deleted History (Undo)</b>
@@ -351,27 +353,27 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
                     </ul>
                   </li>
 
-                 { (userState?.user?.role == "admin" ||
-  userParentAlldata?.paymode == "manual") && <li className='nav-item dropdown'>
-                    <a>
-                      <b>Transactions</b> <i className='fa fa-caret-down' />
-                    </a>
-                    <ul className='dropdown-menu' aria-labelledby='navbarDropdownMenuLink' >
-                      <li>
-                        <CustomLink to='/depositstatement' className='dropdown-item'>
-                          <b>{"Deposit"}</b>
-                        </CustomLink>
-                      </li>
-                      <li>
-                        <CustomLink to='/withdrawstatement' className='dropdown-item'>
-                          <b>Withdraw</b>
-                        </CustomLink>
-                      </li>
-                    </ul>
-                  </li>}
+                  {(userState?.user?.role == "admin" ||
+                    userParentAlldata?.paymode == "manual") && <li className='nav-item dropdown'>
+                      <a>
+                        <b>Transactions</b> <i className='fa fa-caret-down' />
+                      </a>
+                      <ul className='dropdown-menu' aria-labelledby='navbarDropdownMenuLink' >
+                        <li>
+                          <CustomLink to='/depositstatement' className='dropdown-item'>
+                            <b>{"Deposit"}</b>
+                          </CustomLink>
+                        </li>
+                        <li>
+                          <CustomLink to='/withdrawstatement' className='dropdown-item'>
+                            <b>Withdraw</b>
+                          </CustomLink>
+                        </li>
+                      </ul>
+                    </li>}
                   <li className='nav-item dropdown'>
                     <a>
-                      <b>Live Markets</b> <i className='fa fa-caret-down' />
+                      <b>All Casino Market</b> <i className='fa fa-caret-down' />
                     </a>
                     <ul
                       className='dropdown-menu'
@@ -393,7 +395,7 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
 
                   <li className='nav-item dropdown'>
                     <a>
-                      <b>Live Virtual Markets</b> <i className='fa fa-caret-down' />
+                      <b> All Sport Market </b> <i className='fa fa-caret-down' />
                     </a>
                     <ul
                       className='dropdown-menu'
@@ -412,12 +414,12 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
                         })}
                     </ul>
                   </li>
-                 
-                    <li className='nav-item dropdown'>
-                      <a>
-                        <b>Settings</b> <i className='fa fa-caret-down' />
-                      </a>
-                      <ul className='dropdown-menu' aria-labelledby='navbarDropdownMenuLink'>
+
+                  <li className='nav-item dropdown'>
+                    <a>
+                      <b>Settings</b> <i className='fa fa-caret-down' />
+                    </a>
+                    <ul className='dropdown-menu' aria-labelledby='navbarDropdownMenuLink'>
                       {(userState?.user?.role === RoleType.admin) && (<>
                         <li>
                           <CustomLink to='/sports-list/active-matches' className='dropdown-item'>
@@ -443,12 +445,12 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
                       </>
                       )}
 
-                     {(userState?.user?.role === "admin" ||
-  userParentAlldata?.paymode === "manual") && <li>
-                        <CustomLink to='/payment-method' className='dropdown-item'>
-                          <b>{'Payment Method'}</b>
-                        </CustomLink>
-                      </li>}
+                      {(userState?.user?.role === "admin" ||
+                        userParentAlldata?.paymode === "manual") && <li>
+                          <CustomLink to='/payment-method' className='dropdown-item'>
+                            <b>{'Payment Method'}</b>
+                          </CustomLink>
+                        </li>}
 
                       <li>
                         <CustomLink to='/update-tv' className='dropdown-item'>
@@ -458,29 +460,29 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
 
 
 
-                      </ul>
-                    </li>
+                    </ul>
+                  </li>
 
-                  
-                    <li className='nav-item'>
+
+                  <li className='nav-item'>
                     <CustomLink to={`/multi-login`}>
                       <b>Multi Login</b>
                     </CustomLink>
                   </li>
 
-                  <li className='nav-item'>
+                  {/* <li className='nav-item'>
                     <CustomLink to={`/login-reports`}>
                       <b>Login Report</b>
                     </CustomLink>
-                  </li>
-                
+                  </li> */}
+
                 </ul>
 
               </div>
             </nav>
 
 
-            
+
 
             <ul className='user-search list-unstyled'>
               <li className='username' ref={userMenuRef}>
@@ -488,7 +490,7 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
                   {userState?.user?.username} <i className='fa fa-caret-down' />
                 </span>
                 <ul style={{ display: showMenu ? 'block' : 'none' }}>
-                <li>
+                  <li>
                     <CustomLink to='/secure-auth'>
                       <b>Secure Auth Verify</b>
                     </CustomLink>
@@ -526,20 +528,20 @@ const [userParentAlldata, setUserParentAlldata] = React.useState<{ [key: string]
           <img src='/imgs/logo.png' className='wd-100' />
         </div>
         <div className='drawer-content'>
-        <Tree
-  showIcon={false}
-  switcherIcon={null}
-  expandedKeys={expandedKeys}
-  onExpand={(keys) => setExpandedKeys(keys)}
-  loadData={onLoadData}
-  treeData={treeData}
-  onSelect={(keys, e) => {
-    if (e.node.type === 'match') {
-      setIsOpen(false)
-      window.location.href = `/admin/odds/${e.node.matchId}`
-    }
-  }}
-/>
+          <Tree
+            showIcon={false}
+            switcherIcon={null}
+            expandedKeys={expandedKeys}
+            onExpand={(keys) => setExpandedKeys(keys)}
+            loadData={onLoadData}
+            treeData={treeData}
+            onSelect={(keys, e) => {
+              if (e.node.type === 'match') {
+                setIsOpen(false)
+                window.location.href = `/admin/odds/${e.node.matchId}`
+              }
+            }}
+          />
 
         </div>
       </Drawer>
