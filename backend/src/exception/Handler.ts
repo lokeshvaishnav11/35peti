@@ -24,7 +24,7 @@ class Handler {
         })
       }
     })
-
+ 
     return _express
   }
 

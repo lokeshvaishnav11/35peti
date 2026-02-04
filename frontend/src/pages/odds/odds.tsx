@@ -296,7 +296,7 @@ const Odds = () => {
    React.useEffect(() => {
       async function getUrl() {
         const res = await betService.tvStatus()
-        console.log(res.data.stv, 'url 1')
+        console.log(res.data.data.stv, 'url 1')
         setstv(prev => (res.data.stv));
       }
       getUrl();

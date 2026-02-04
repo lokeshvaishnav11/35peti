@@ -125,8 +125,8 @@ const CasinoWrapper = (props: any) => {
    React.useEffect(() => {
     async function getUrl() {
       const res = await betService.tvStatus()
-      // console.log(res.data.ctv, 'url 1')
-      setctv(prev => (res.data.ctv));
+      console.log(res.data.data.ctv, 'url 1')
+      setctv(prev => (res.data.data.ctv));
     }
     getUrl();
   }, [])
@@ -495,7 +495,7 @@ const CasinoWrapper = (props: any) => {
                     background: '#000',
                   }}
                 >
-                  {liveMatchData && (
+                  {liveMatchData && ctv && (
                     <iframe
                       title='stream'
                       width='100%'
@@ -604,7 +604,7 @@ const CasinoWrapper = (props: any) => {
                       background: '#000',
                     }}
                   >
-                    {liveMatchData &&(
+                    {liveMatchData && ctv &&(
                       <iframe
                         title='stream'
                         width='100%'
