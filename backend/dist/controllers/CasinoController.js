@@ -1750,6 +1750,29 @@ class CasinoController extends ApiController_1.ApiController {
                 return this.fail(res, err.message);
             }
         });
+        this.updateTv = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { type, value } = req.body;
+                console.log(req.body);
+                let updateData = {};
+                if (type === "casinoTv") {
+                    updateData.ctv = value;
+                }
+                if (type === "sportTv") {
+                    updateData.stv = value;
+                }
+                if (Object.keys(updateData).length === 0) {
+                    return this.fail(res, "Invalid TV type");
+                }
+                // ⚠️ agar sab users ke liye change karna hai
+                yield User_1.User.updateMany({}, { $set: updateData });
+                return this.success(res, {}, "TV setting updated successfully!");
+            }
+            catch (e) {
+                const err = e;
+                return this.fail(res, err.message);
+            }
+        });
         this.results = (req, res) => __awaiter(this, void 0, void 0, function* () {
             let { type: gameType } = req.params;
             let { filter_date, page, roundId } = req.query;

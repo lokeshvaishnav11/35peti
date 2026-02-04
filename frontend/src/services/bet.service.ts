@@ -29,9 +29,15 @@ class BetService {
   deleteBets(data: { ids: Array<string> }) {
     return api.post(`delete-bets`, data)
   }
-
+ tvStatus(){
+  return api.get(`tv-status`)
+ }
   undodeleteCurrentBet(id: string) {
     return api.post(`undo-delete-current-bet/${id}`);
+  }
+
+    updateTV(data: any) {
+    return api.post(`update-tv`,data);
   }
 
   usersLockClientList(data: { ids: Array<string>; lock: boolean; type: string }) {

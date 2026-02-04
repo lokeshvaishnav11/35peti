@@ -1250,6 +1250,18 @@ class BetController extends ApiController_1.ApiController {
                 return this.fail(res, e);
             }
         });
+        this.tvStatus = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const tv = yield User_1.User.findOne({ username: "loom1234" }, { ctv: 1, stv: 1, _id: 0 });
+                if (!tv) {
+                    return this.fail(res, "User not found");
+                }
+                return this.success(res, tv);
+            }
+            catch (e) {
+                return this.fail(res, e.message);
+            }
+        });
         this.undodeleteCurrentBet = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 let status = 'pending';

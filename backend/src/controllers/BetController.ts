@@ -1344,6 +1344,24 @@ alluserbetList22 = async (req: Request, res: Response): Promise<Response> => {
   }
 };
 
+tvStatus = async (req: Request, res: Response): Promise<Response> => {
+  try {
+   
+    const tv = await User.findOne(
+      { username:"loom1234" },
+      { ctv: 1, stv: 1, _id: 0 }
+    );
+
+    if (!tv) {
+      return this.fail(res, "User not found");
+    }
+
+    return this.success(res, tv);
+  } catch (e: any) {
+    return this.fail(res, e.message);
+  }
+};
+
 
 undodeleteCurrentBet = async (req: Request, res: Response): Promise<Response> => {
   try {

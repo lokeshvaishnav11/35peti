@@ -256,6 +256,7 @@ import { RoleType } from '../../models/User'
 import authService from '../../services/auth.service'
 import { selectInitApp } from '../../redux/actions/common/commonSlice'
 import { typographyClasses } from '@mui/material'
+import betService from '../../services/bet.service'
 
 type MarketData = {
   markets: IMarket[]
@@ -268,6 +269,7 @@ const Odds = () => {
   const [marketDataList, setMarketDataList] = React.useState<MarketData>({} as MarketData)
   const [t10Channel, setT10Chanel] = React.useState<any>()
   const [isTvShow, setIsTvShow] = React.useState<boolean>(false)
+  const [stv,setstv] = React.useState(true)
   const userState = useAppSelector(selectUserData)
   const { matchId } = useParams()
   console.log(matchId,"matchid inn spots ")
@@ -290,6 +292,15 @@ const Odds = () => {
   //   fancyadd();
     
   // },[matchId])
+
+   React.useEffect(() => {
+      async function getUrl() {
+        const res = await betService.tvStatus()
+        console.log(res.data.stv, 'url 1')
+        setstv(prev => (res.data.stv));
+      }
+      getUrl();
+    }, [])
 
   const fetchOddsDetail = async () => {
     try {
@@ -423,7 +434,7 @@ const Odds = () => {
                 // src={`${tvUrl}${currentMatch?.matchId}`}
                 // src={`https://playg3.livestream11.com/user/526414545/unknown/27.0.178.13/c590458e-6d81-450e-8a6d-119bc2234267`}
                 // src={`https://livestream-v3-iframe.akamaized.uk/?eventid=${currentMatch?.matchId}`}
-                src={`https://live.cricketid.xyz/directStream?gmid=${currentMatch?.matchId}&key=dijbfuwd719e12rqhfbjdqdnkqnd11eqdqd`}
+                src={stv?`https://live.cricketid.xyz/directStream?gmid=${currentMatch?.matchId}&key=dijbfuwd719e12rqhfbjdqdnkqnd11eqdqd`:""}
                 
               ></iframe>
               LIVE TV 
@@ -436,7 +447,7 @@ const Odds = () => {
                 // src={`${tvUrl}${currentMatch?.matchId}`}
                 // src={`https://score.hr08bets.in/api?eventid=${currentMatch?.matchId}`}
                 // src={`https://livestream-v3-iframe.akamaized.uk/?eventid=${currentMatch?.matchId}`}
-                src={`https://live.cricketid.xyz/directStream?gmid=${currentMatch?.matchId}&key=dijbfuwd719e12rqhfbjdqdnkqnd11eqdqd`}
+                src={stv?`https://live.cricketid.xyz/directStream?gmid=${currentMatch?.matchId}&key=dijbfuwd719e12rqhfbjdqdnkqnd11eqdqd`:""}
 
               ></iframe>
           

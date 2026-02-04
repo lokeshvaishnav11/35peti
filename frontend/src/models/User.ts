@@ -44,6 +44,8 @@ export default interface User {
   transactionPassword?: string
   selected?: boolean
   [key: string]: any
+ 
+ 
 }
 
 export type PartnershipAllRatioType = { parent: string; ratio: number }

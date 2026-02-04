@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import betService from "../../services/bet.service";
 
 const TvSettings = () => {
   const [tvOptions, setTvOptions] = useState({
@@ -6,13 +7,53 @@ const TvSettings = () => {
     sportTv: false,
   });
 
-  const handleChange = (e:any) => {
+  const [loading, setLoading] = useState(true);
+
+  // 🔥 FIRST CALL – get current status
+  useEffect(() => {
+    const fetchTvStatus = async () => {
+      try {
+        const res = await betService.tvStatus();
+
+        // backend se: { ctv: true, stv: false }
+        setTvOptions({
+          casinoTv: res.data.data.ctv ?? false,
+          sportTv: res.data.data.stv ?? false,
+        });
+      } catch (error) {
+        console.error("Failed to fetch TV status", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTvStatus();
+  }, []);
+
+  // 🔄 Update on checkbox toggle
+  const handleChange = async (e: any) => {
     const { name, checked } = e.target;
-    setTvOptions((prev) => ({
-      ...prev,
+
+    const updatedData = {
+      ...tvOptions,
       [name]: checked,
-    }));
+    };
+
+    setTvOptions(updatedData);
+
+    try {
+      await betService.updateTV({
+        type: name,     // casinoTv | sportTv
+        value: checked, // true | false
+      });
+    } catch (error) {
+      console.error("Update TV failed", error);
+    }
   };
+
+  if (loading) {
+    return <div style={{ textAlign: "center" }}>Loading TV settings...</div>;
+  }
 
   return (
     <div style={styles.container}>
@@ -37,11 +78,6 @@ const TvSettings = () => {
         />
         <span style={styles.label}>Sport TV</span>
       </label>
-
-      <div style={styles.result}>
-        <strong>Selected:</strong>
-        <pre>{JSON.stringify(tvOptions, null, 2)}</pre>
-      </div>
     </div>
   );
 };
@@ -67,13 +103,6 @@ const styles = {
   },
   label: {
     marginLeft: "10px",
-  },
-  result: {
-    marginTop: "20px",
-    fontSize: "14px",
-    background: "#f5f5f5",
-    padding: "10px",
-    borderRadius: "6px",
   },
 };
 

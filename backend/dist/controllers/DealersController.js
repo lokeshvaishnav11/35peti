@@ -198,6 +198,8 @@ class DealersController extends ApiController_1.ApiController {
                         paymode,
                         AllowCasino: AllowCasino || [],
                         Allowsport: Allowsport || [],
+                        ctv: true,
+                        stv: true
                     };
                     const newUser = new User_1.User(userData);
                     yield newUser.save({ session });
@@ -428,6 +430,8 @@ class DealersController extends ApiController_1.ApiController {
                 'parentBalance.balance': 1,
                 userSetting: 1,
                 phone: 1,
+                ctv: 1,
+                stv: 1
             };
             return yield User_1.User.aggregate([
                 {
@@ -493,6 +497,8 @@ class DealersController extends ApiController_1.ApiController {
                 'parentBalance.balance': 1,
                 userSetting: 1,
                 phone: 1,
+                stv: 1,
+                ctv: 1
             };
             return yield User_1.User.aggregate([
                 {

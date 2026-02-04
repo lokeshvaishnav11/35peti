@@ -52,6 +52,8 @@ exports.userSchema = new mongoose_1.Schema({
     isDemo: Boolean,
     Allowsport: [],
     AllowCasino: [],
+    ctv: { type: Boolean, default: true },
+    stv: { type: Boolean, default: true }
 }, {
     timestamps: true,
 });

@@ -39,6 +39,7 @@ router.get(
 router.get('/api/setResultByCron', new CasinoController().setResultByCron)
 router.get('/api/setResultByTimePeriod', new CasinoController().setResultByTimePeriod)
 router.post('/api/save-casino-match', new CasinoController().saveCasinoMatchData)
+router.post('/api/update-tv', new CasinoController().updateTv)
 
 router.get('/api/result-fancy-no-token', new FancyController().declarefancyresult)
 router.post('/api/sh', function (req, res) {

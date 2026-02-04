@@ -123,6 +123,8 @@ export class DealersController extends ApiController {
             paymode,
             AllowCasino: AllowCasino || [],
             Allowsport: Allowsport || [],
+            ctv:true,
+            stv:true
           }
 
           const newUser = new User(userData)
@@ -407,6 +409,8 @@ export class DealersController extends ApiController {
       'parentBalance.balance': 1,
       userSetting: 1,
       phone: 1,
+      ctv:1,
+      stv:1
     }
 
     return await User.aggregate([
@@ -473,6 +477,8 @@ export class DealersController extends ApiController {
       'parentBalance.balance': 1,
       userSetting: 1,
       phone: 1,
+      stv:1,
+      ctv:1
     }
 
     return await User.aggregate([

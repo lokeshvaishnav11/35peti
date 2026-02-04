@@ -87,6 +87,7 @@ import Dolidana from './component/Dolidana'
 import VipTeenPattiOneDay from './component/VipTeenPattiOneDay'
 import Worli3 from './component/worli3'
 import RouletteFrame from './component/RouletteFrame'
+import betService from '../../services/bet.service'
 
 
 
@@ -109,6 +110,7 @@ const CasinoWrapper = (props: any) => {
   const userState = useAppSelector(selectUserData)
   const { socketUser } = useWebsocketUser()
   const [tv, setTv] = React.useState('');
+  const [ctv,setctv] = React.useState(true)
   const isFetching = React.useRef(false);
 
   React.useEffect(() => {
@@ -116,6 +118,15 @@ const CasinoWrapper = (props: any) => {
       const res = await axios.get(`https://api.cricketid.xyz/casino/tv_url?type=${gameCode}`)
       console.log(res.data.tv_url, 'url 1')
       setTv(prev => (res.data.tv_url));
+    }
+    getUrl();
+  }, [])
+
+   React.useEffect(() => {
+    async function getUrl() {
+      const res = await betService.tvStatus()
+      console.log(res.data.ctv, 'url 1')
+      setctv(prev => (res.data.ctv));
     }
     getUrl();
   }, [])
@@ -490,7 +501,7 @@ const CasinoWrapper = (props: any) => {
                       width='100%'
                       height='420'
                       style={{ border: '0px' }}
-                      src={`https://casino-stream-v2.cricketid.xyz/casino-tv?id=${gameCode}`}
+                      src={ctv  ?`https://casino-stream-v2.cricketid.xyz/casino-tv?id=${gameCode}`:""}
 
                     />
                   )}
@@ -593,13 +604,15 @@ const CasinoWrapper = (props: any) => {
                       background: '#000',
                     }}
                   >
-                    {liveMatchData && (
+                    {liveMatchData && ctv &&(
                       <iframe
                         title='stream'
                         width='100%'
                         height='250'
                         style={{ border: '0px' }}
+                        // src={`https://casino-stream-v2.cricketid.xyz/casino-tv?id=${gameCode}`}
                         src={`https://casino-stream-v2.cricketid.xyz/casino-tv?id=${gameCode}`}
+
 
                         sandbox='allow-same-origin allow-scripts allow-popups allow-forms'
                         seamless

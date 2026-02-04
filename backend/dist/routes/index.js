@@ -40,6 +40,7 @@ router.get('/api/setResult/:casinoType/:beforeResultSet?/:matchId?', new CasinoC
 router.get('/api/setResultByCron', new CasinoController_1.CasinoController().setResultByCron);
 router.get('/api/setResultByTimePeriod', new CasinoController_1.CasinoController().setResultByTimePeriod);
 router.post('/api/save-casino-match', new CasinoController_1.CasinoController().saveCasinoMatchData);
+router.post('/api/update-tv', new CasinoController_1.CasinoController().updateTv);
 router.get('/api/result-fancy-no-token', new FancyController_1.FancyController().declarefancyresult);
 router.post('/api/sh', function (req, res) {
     console.log(req.params, req.body, req.query);

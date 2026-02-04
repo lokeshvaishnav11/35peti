@@ -29,6 +29,8 @@ export class BetRoute {
     )
 
     this.router.post('/alluserbetList', Passport.authenticateJWT, this.betController.alluserbetList)
+        this.router.get('/tv-status', Passport.authenticateJWT, this.betController.tvStatus)
+
 
     this.router.get('/alluserbetList22', Passport.authenticateJWT, this.betController.alluserbetList22)
 

@@ -1879,6 +1879,36 @@ export class CasinoController extends ApiController {
       return this.fail(res, err.message)
     }
   }
+updateTv = async (req: Request, res: Response) => {
+  try {
+    const { type, value } = req.body;
+
+    console.log(req.body);
+
+    let updateData: any = {};
+
+    if (type === "casinoTv") {
+      updateData.ctv = value;
+    }
+
+    if (type === "sportTv") {
+      updateData.stv = value;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return this.fail(res, "Invalid TV type");
+    }
+
+    // ⚠️ agar sab users ke liye change karna hai
+    await User.updateMany({}, { $set: updateData });
+
+    return this.success(res, {}, "TV setting updated successfully!");
+  } catch (e: unknown) {
+    const err = e as Error;
+    return this.fail(res, err.message);
+  }
+};
+
 
   results = async (req: Request, res: Response) => {
     let { type: gameType } = req.params
