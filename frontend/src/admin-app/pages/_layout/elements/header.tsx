@@ -61,6 +61,7 @@ const Header = () => {
 
   const [isOpen, setIsOpen] = React.useState(false)
   const [gameList, setGameList] = React.useState([])
+    const [sgameList, setsGameList] = React.useState([])
 
   // React.useEffect(() => {
   //   axios.get(`adminMessage.json?v=${Date.now()}`).then((res: AxiosResponse) => {
@@ -72,6 +73,12 @@ const Header = () => {
     if (gameList.length <= 0)
       casinoService.getCasinoList().then((res: AxiosResponse<any>) => {
         setGameList(res.data.data)
+      })
+  }, [])
+   React.useEffect(() => {
+    if (gameList.length <= 0)
+      sportsService.getSports().then((res: AxiosResponse<any>) => {
+        setsGameList(res.data.data)
       })
   }, [])
 
@@ -353,7 +360,7 @@ const Header = () => {
                     </ul>
                   </li>
 
-                  {(userState?.user?.role == "admin" ||
+                  {/* {(userState?.user?.role == "admin" ||
                     userParentAlldata?.paymode == "manual") && <li className='nav-item dropdown'>
                       <a>
                         <b>Transactions</b> <i className='fa fa-caret-down' />
@@ -370,7 +377,7 @@ const Header = () => {
                           </CustomLink>
                         </li>
                       </ul>
-                    </li>}
+                    </li>} */}
                   <li className='nav-item dropdown'>
                     <a>
                       <b>All Casino Market</b> <i className='fa fa-caret-down' />
@@ -402,12 +409,12 @@ const Header = () => {
                       aria-labelledby='navbarDropdownMenuLink'
                       style={{ height: '400px', overflowY: 'scroll' }}
                     >
-                      {gameList?.length > 0 &&
-                        gameList.map((Item: any, key: number) => {
+                      {sgameList?.length > 0 &&
+                        sgameList.map((Item: any, key: number) => {
                           return (
                             <li key={key}>
-                              <CustomLink to={`/casino/${Item.slug}`} className='dropdown-item'>
-                                <b>{Item.title}</b>
+                              <CustomLink to={``} className='dropdown-item'>
+                                <b>{Item.name}</b>
                               </CustomLink>
                             </li>
                           )

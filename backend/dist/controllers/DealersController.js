@@ -283,7 +283,7 @@ class DealersController extends ApiController_1.ApiController {
         return __awaiter(this, void 0, void 0, function* () {
             const { username, page, search, type, status } = req.query;
             const pageNo = page ? page : '1';
-            const pageLimit = 20;
+            const pageLimit = 50;
             const currentUser = req.user;
             const select = {
                 _id: 1,

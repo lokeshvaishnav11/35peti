@@ -728,7 +728,7 @@ const ListClients = () => {
                     className={`nav-link ${activeDeactive ? "active" : ""}`}
                     aria-current="page"
                     href="#"
-                    onClick={(e) => typesOfClients(e, "true")}
+                    onClick={(e) => typesOfClients(e, "false")}
                   >
                     Active
                   </a>
@@ -737,7 +737,7 @@ const ListClients = () => {
                   <a
                     className={`nav-link ${!activeDeactive ? "active" : ""}`}
                     href="#"
-                    onClick={(e) => typesOfClients(e, "false")}
+                    onClick={(e) => typesOfClients(e, "true")}
                   >
                     Deactive
                   </a>
@@ -796,6 +796,7 @@ const ListClients = () => {
                           onChange={handleSelectAll}
                         />
                       </th> */}
+                        <th>Sr</th>
                       <th>User Name</th>
                       <th>Credit Referance</th>
                       <th>Balance</th>
@@ -808,6 +809,7 @@ const ListClients = () => {
                       <th>Exposure Limit</th>
                       <th>Default %</th>
                       <th>Account Type</th>
+                       <th>Sr</th>
                       <th className="noExport">Actions</th>
                     </tr>
                   </thead>
@@ -842,6 +844,9 @@ const ListClients = () => {
                               onChange={() => handleSelectItem?.(user)}
                             />
                           </td> */}
+                           <td>
+                            {index +1}
+                          </td>
                           <td>
                             {user.role !== RoleType.user && (
                               <CustomLink to={`/list-clients/${user.username}`}>
@@ -916,6 +921,9 @@ const ListClients = () => {
                           <td>{user.exposerLimit ? user.exposerLimit : 0}</td>
                           <td>{getcurrentpartnership(user)}</td>
                           <td>{RoleName[user.role!]}</td>
+                           <td>
+                            {index +1}
+                          </td>
                           <td>
                             <a
                               onClick={() => {
