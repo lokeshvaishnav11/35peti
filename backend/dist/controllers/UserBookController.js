@@ -16,6 +16,8 @@ const User_1 = require("../models/User");
 const Role_1 = require("../models/Role");
 const Market_1 = require("../models/Market");
 const Balance_1 = require("../models/Balance");
+const Sport_1 = require("../models/Sport");
+const Match_1 = require("../models/Match");
 var ObjectId = require('mongoose').Types.ObjectId;
 class UserBookController extends ApiController_1.ApiController {
     constructor() {
@@ -81,114 +83,254 @@ class UserBookController extends ApiController_1.ApiController {
             yield Promise.all(promiseposition);
             return this.success(res, Object.assign({}, new_showdata));
         });
+        // getmarketanalysis = async (req: Request, res: Response) => {
+        //   const user: any = req.user
+        //   // {parentStr:{"$elemMatch": { "$eq":ObjectId(user._id)}}}
+        //   const userChilds = await User.find(
+        //     { parentStr: { $elemMatch: { $eq: ObjectId(user._id) } }, role: RoleType.user },
+        //     { _id: 1 },
+        //   )
+        //   const useridmap: any = []
+        //   userChilds.map((Item) => useridmap.push(ObjectId(Item._id)))
+        //   const matchfilter:any = {
+        //     $match: {
+        //       bet_on: {$in:[BetOn.MATCH_ODDS, BetOn.FANCY]},
+        //       userId: { $in: useridmap },
+        //       status: 'pending',
+        //     },
+        //   }
+        //   const groupfilter = {
+        //     $group: {
+        //       _id: '$matchId',
+        //       betCount: { $sum: 1 },
+        //       matchName: { $first: '$matchName' },
+        //       allBets: {
+        //         $push: {
+        //           userId: '$userId',
+        //           odds: '$odds',
+        //           stack: '$stack',
+        //           bet_on: '$bet_on',
+        //           isBack: '$isBack',
+        //           selectionName: '$selectionName',
+        //           marketId: '$marketId',
+        //           selectionId: '$selectionId',
+        //           ratioStr: '$ratioStr',
+        //         },
+        //       },
+        //     },
+        //   }
+        //   const betlist: any = await Bet.aggregate([matchfilter, groupfilter])
+        //   let filterMatchId: any = []
+        //   betlist.map((ItemMatch: any) => {
+        //     filterMatchId.push(parseInt(ItemMatch._id))
+        //   })
+        //   const marketlist: any = await Market.find(
+        //     { matchId: { $in: filterMatchId } },
+        //     { marketId: 1, matchId: 1, marketName: 1, runners: 1 },
+        //   )
+        //   let completeBookList: any = []
+        //   const bookpromise = betlist.map(async (Item: any) => {
+        //     let matchPl = { matchName: Item.matchName, betCount: Item.betCount, matchId: Item._id }
+        //     let matchWiseMarket: any = {}
+        //     let completemarket_list: any = []
+        //     const filterMarketByMatch = marketlist.filter((ItemMarket: any) => {
+        //       return ItemMarket.matchId == Item._id
+        //     })
+        //     const filterMarketByMatchPromise = filterMarketByMatch.map(async (ItemMarketListNew: any) => {
+        //       const filterBetlist = Item.allBets.filter((ItemBetsFilter: any) => {
+        //         return ItemBetsFilter.marketId == ItemMarketListNew.marketId
+        //       })
+        //       if (filterBetlist.length > 0) {
+        //         completemarket_list.push(ItemMarketListNew.marketId)
+        //       }
+        //       const betPromise = filterBetlist.map(async (ItemBet: any) => {
+        //         const allRatio = ItemBet.ratioStr.allRatio
+        //         const filterSelfRatio = allRatio.filter(
+        //           (ItemN: any) => ItemN.parent.toString() == user._id,
+        //         )[0]
+        //         if (filterSelfRatio != undefined) {
+        //           let parentRatio: any = filterSelfRatio.ratio
+        //           let getOdds: any = ItemBet.odds
+        //           let lossAmt: any = ItemBet.stack * (parentRatio / 100)
+        //           let profitAmt = (getOdds - 1) * lossAmt * (parentRatio / 100)
+        //           const filterMarket = filterMarketByMatch.filter((ItemMarket: any) => {
+        //             return ItemMarket.marketId == ItemBet.marketId
+        //           })
+        //           const promiseMarket = filterMarket.map(async (ItemMarketList: any) => {
+        //             ItemMarketList.runners.map((ItemRunners: any) => {
+        //               let selectionId: any = ItemRunners.selectionId
+        //               if (!matchWiseMarket[ItemMarketList.marketId + '_' + selectionId]) {
+        //                 matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] = 0
+        //               }
+        //               if (selectionId == ItemBet.selectionId) {
+        //                 if (ItemBet.isBack) {
+        //                   matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] =
+        //                     matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] + profitAmt
+        //                 } else {
+        //                   matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] =
+        //                     matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] - profitAmt
+        //                 }
+        //               } else {
+        //                 if (ItemBet.isBack) {
+        //                   matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] =
+        //                     matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] - lossAmt
+        //                 } else {
+        //                   matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] =
+        //                     matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] + lossAmt
+        //                 }
+        //               }
+        //             })
+        //           })
+        //           await Promise.all(promiseMarket)
+        //         }
+        //       })
+        //       await Promise.all(betPromise)
+        //     })
+        //     await Promise.all(filterMarketByMatchPromise)
+        //     matchPl = {
+        //       ...matchPl,
+        //       ...{
+        //         matchWiseMarket: matchWiseMarket,
+        //         filterMarketByMatch: filterMarketByMatch,
+        //         completemarket_list: completemarket_list,
+        //       },
+        //     }
+        //     completeBookList.push(matchPl)
+        //   })
+        //   await Promise.all(bookpromise)
+        //   return this.success(res, completeBookList)
+        // }
         this.getmarketanalysis = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const user = req.user;
-            // {parentStr:{"$elemMatch": { "$eq":ObjectId(user._id)}}}
-            const userChilds = yield User_1.User.find({ parentStr: { $elemMatch: { $eq: ObjectId(user._id) } }, role: Role_1.RoleType.user }, { _id: 1 });
-            const useridmap = [];
-            userChilds.map((Item) => useridmap.push(ObjectId(Item._id)));
-            const matchfilter = {
-                $match: {
-                    bet_on: { $in: [Bet_1.BetOn.MATCH_ODDS, Bet_1.BetOn.FANCY] },
-                    userId: { $in: useridmap },
-                    status: 'pending',
-                },
-            };
-            const groupfilter = {
-                $group: {
-                    _id: '$matchId',
-                    betCount: { $sum: 1 },
-                    matchName: { $first: '$matchName' },
-                    allBets: {
-                        $push: {
-                            userId: '$userId',
-                            odds: '$odds',
-                            stack: '$stack',
-                            bet_on: '$bet_on',
-                            isBack: '$isBack',
-                            selectionName: '$selectionName',
-                            marketId: '$marketId',
-                            selectionId: '$selectionId',
-                            ratioStr: '$ratioStr',
+            try {
+                const user = req.user;
+                /* ---------------- USER CHILD IDS ---------------- */
+                const userChilds = yield User_1.User.find({
+                    parentStr: { $elemMatch: { $eq: ObjectId(user._id) } },
+                    role: Role_1.RoleType.user,
+                }, { _id: 1 });
+                const useridmap = userChilds.map((u) => ObjectId(u._id));
+                /* ---------------- BET AGGREGATION ---------------- */
+                const matchfilter = {
+                    $match: {
+                        bet_on: { $in: [Bet_1.BetOn.MATCH_ODDS, Bet_1.BetOn.FANCY] },
+                        userId: { $in: useridmap },
+                        status: 'pending',
+                    },
+                };
+                const groupfilter = {
+                    $group: {
+                        _id: '$matchId',
+                        betCount: { $sum: 1 },
+                        matchName: { $first: '$matchName' },
+                        allBets: {
+                            $push: {
+                                userId: '$userId',
+                                odds: '$odds',
+                                stack: '$stack',
+                                bet_on: '$bet_on',
+                                isBack: '$isBack',
+                                selectionName: '$selectionName',
+                                marketId: '$marketId',
+                                selectionId: '$selectionId',
+                                ratioStr: '$ratioStr',
+                            },
                         },
                     },
-                },
-            };
-            const betlist = yield Bet_1.Bet.aggregate([matchfilter, groupfilter]);
-            let filterMatchId = [];
-            betlist.map((ItemMatch) => {
-                filterMatchId.push(parseInt(ItemMatch._id));
-            });
-            const marketlist = yield Market_1.Market.find({ matchId: { $in: filterMatchId } }, { marketId: 1, matchId: 1, marketName: 1, runners: 1 });
-            let completeBookList = [];
-            const bookpromise = betlist.map((Item) => __awaiter(this, void 0, void 0, function* () {
-                let matchPl = { matchName: Item.matchName, betCount: Item.betCount, matchId: Item._id };
-                let matchWiseMarket = {};
-                let completemarket_list = [];
-                const filterMarketByMatch = marketlist.filter((ItemMarket) => {
-                    return ItemMarket.matchId == Item._id;
+                };
+                const betlist = yield Bet_1.Bet.aggregate([matchfilter, groupfilter]);
+                if (!betlist.length) {
+                    return this.success(res, []);
+                }
+                /* ---------------- MATCH IDS ---------------- */
+                const filterMatchId = betlist.map((i) => Number(i._id));
+                /* ---------------- MARKET DATA (UNCHANGED) ---------------- */
+                const marketlist = yield Market_1.Market.find({ matchId: { $in: filterMatchId } }, { marketId: 1, matchId: 1, marketName: 1, runners: 1 });
+                /* ================= ADDITION START (SPORT MAP) ================= */
+                /* ---- MATCH → SPORT ID ---- */
+                const matchList = yield Match_1.Match.find({ matchId: { $in: filterMatchId } }, { matchId: 1, sportId: 1 });
+                const matchSportMap = {};
+                matchList.forEach((m) => {
+                    matchSportMap[m.matchId] = m.sportId;
                 });
-                const filterMarketByMatchPromise = filterMarketByMatch.map((ItemMarketListNew) => __awaiter(this, void 0, void 0, function* () {
-                    const filterBetlist = Item.allBets.filter((ItemBetsFilter) => {
-                        return ItemBetsFilter.marketId == ItemMarketListNew.marketId;
-                    });
-                    if (filterBetlist.length > 0) {
-                        completemarket_list.push(ItemMarketListNew.marketId);
-                    }
-                    const betPromise = filterBetlist.map((ItemBet) => __awaiter(this, void 0, void 0, function* () {
-                        const allRatio = ItemBet.ratioStr.allRatio;
-                        const filterSelfRatio = allRatio.filter((ItemN) => ItemN.parent.toString() == user._id)[0];
-                        if (filterSelfRatio != undefined) {
-                            let parentRatio = filterSelfRatio.ratio;
-                            let getOdds = ItemBet.odds;
-                            let lossAmt = ItemBet.stack * (parentRatio / 100);
-                            let profitAmt = (getOdds - 1) * lossAmt * (parentRatio / 100);
-                            const filterMarket = filterMarketByMatch.filter((ItemMarket) => {
-                                return ItemMarket.marketId == ItemBet.marketId;
-                            });
-                            const promiseMarket = filterMarket.map((ItemMarketList) => __awaiter(this, void 0, void 0, function* () {
-                                ItemMarketList.runners.map((ItemRunners) => {
-                                    let selectionId = ItemRunners.selectionId;
-                                    if (!matchWiseMarket[ItemMarketList.marketId + '_' + selectionId]) {
-                                        matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] = 0;
-                                    }
-                                    if (selectionId == ItemBet.selectionId) {
-                                        if (ItemBet.isBack) {
-                                            matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] =
-                                                matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] + profitAmt;
-                                        }
-                                        else {
-                                            matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] =
-                                                matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] - profitAmt;
-                                        }
-                                    }
-                                    else {
-                                        if (ItemBet.isBack) {
-                                            matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] =
-                                                matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] - lossAmt;
-                                        }
-                                        else {
-                                            matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] =
-                                                matchWiseMarket[ItemMarketList.marketId + '_' + selectionId] + lossAmt;
-                                        }
-                                    }
-                                });
-                            }));
-                            yield Promise.all(promiseMarket);
+                /* ---- SPORT ID → SPORT NAME ---- */
+                const sportIds = [
+                    ...new Set(matchList.map((m) => m.sportId)),
+                ];
+                const sportList = yield Sport_1.Sport.find({ sportId: { $in: sportIds } }, { sportId: 1, name: 1 });
+                const sportMap = {};
+                sportList.forEach((s) => {
+                    sportMap[s.sportId] = s.name;
+                });
+                /* ================= ADDITION END ================= */
+                /* ---------------- BOOK CALCULATION ---------------- */
+                let completeBookList = [];
+                const bookpromise = betlist.map((Item) => __awaiter(this, void 0, void 0, function* () {
+                    const filterMarketByMatch = marketlist.filter((m) => m.matchId == Item._id);
+                    // ✅ ONLY NEW LINES USED HERE
+                    const sportId = matchSportMap[Item._id];
+                    const sportName = sportMap[sportId];
+                    let matchWiseMarket = {};
+                    let completemarket_list = [];
+                    const filterMarketByMatchPromise = filterMarketByMatch.map((ItemMarketListNew) => __awaiter(this, void 0, void 0, function* () {
+                        const filterBetlist = Item.allBets.filter((b) => b.marketId == ItemMarketListNew.marketId);
+                        if (filterBetlist.length > 0) {
+                            completemarket_list.push(ItemMarketListNew.marketId);
                         }
+                        const betPromise = filterBetlist.map((ItemBet) => __awaiter(this, void 0, void 0, function* () {
+                            const allRatio = ItemBet.ratioStr.allRatio || [];
+                            const filterSelfRatio = allRatio.find((r) => r.parent.toString() == user._id);
+                            if (!filterSelfRatio)
+                                return;
+                            const parentRatio = filterSelfRatio.ratio;
+                            const getOdds = ItemBet.odds;
+                            const lossAmt = ItemBet.stack * (parentRatio / 100);
+                            const profitAmt = (getOdds - 1) *
+                                lossAmt *
+                                (parentRatio / 100);
+                            ItemMarketListNew.runners.forEach((ItemRunners) => {
+                                const selectionId = ItemRunners.selectionId;
+                                const key = ItemMarketListNew.marketId +
+                                    '_' +
+                                    selectionId;
+                                if (!matchWiseMarket[key])
+                                    matchWiseMarket[key] = 0;
+                                if (selectionId ==
+                                    ItemBet.selectionId) {
+                                    matchWiseMarket[key] +=
+                                        ItemBet.isBack
+                                            ? profitAmt
+                                            : -profitAmt;
+                                }
+                                else {
+                                    matchWiseMarket[key] +=
+                                        ItemBet.isBack
+                                            ? -lossAmt
+                                            : lossAmt;
+                                }
+                            });
+                        }));
+                        yield Promise.all(betPromise);
                     }));
-                    yield Promise.all(betPromise);
+                    yield Promise.all(filterMarketByMatchPromise);
+                    completeBookList.push({
+                        matchId: Item._id,
+                        matchName: Item.matchName,
+                        betCount: Item.betCount,
+                        // ✅ ADDED (WORKING)
+                        sportId: sportId,
+                        sportName: sportName,
+                        matchWiseMarket: matchWiseMarket,
+                        filterMarketByMatch: filterMarketByMatch,
+                        completemarket_list: completemarket_list,
+                    });
                 }));
-                yield Promise.all(filterMarketByMatchPromise);
-                matchPl = Object.assign(Object.assign({}, matchPl), {
-                    matchWiseMarket: matchWiseMarket,
-                    filterMarketByMatch: filterMarketByMatch,
-                    completemarket_list: completemarket_list,
-                });
-                completeBookList.push(matchPl);
-            }));
-            yield Promise.all(bookpromise);
-            return this.success(res, completeBookList);
+                yield Promise.all(bookpromise);
+                return this.success(res, completeBookList);
+            }
+            catch (err) {
+                console.error(err);
+                // return this.error(res, 'Something went wrong')
+            }
         });
         this.getuserbook = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const user = req.user;

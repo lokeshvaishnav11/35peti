@@ -546,7 +546,7 @@ const AddUser = () => {
                       )}
 
 
-                      <div className="col-md-6">
+                      {userState.user.role == "admin" && (<div className="col-md-6">
                         <div className="form-group">
                           <label htmlFor="paymode"> Transaction Type</label>
                           <span className="text-danger">*</span>
@@ -558,7 +558,7 @@ const AddUser = () => {
 
                           </select>
                         </div>
-                      </div>
+                      </div>)}
                     </div>
                   </div>
                 </div>
