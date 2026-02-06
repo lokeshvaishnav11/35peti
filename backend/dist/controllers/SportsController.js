@@ -658,13 +658,59 @@ class SportsController extends ApiController_1.ApiController {
     //     return this.fail(res, e)
     //   }
     // }
+    // async getSportList(req: Request, res: Response): Promise<Response> {
+    //   try {
+    //     // @ts-ignore
+    //     const userId = req.user._id
+    //     console.log(userId, "ghjk")
+    //     // 1️⃣ current user
+    //     const user: any = await User.findById(userId, {
+    //       Allowsport: 1,
+    //       parentStr: 1,
+    //     }).lean()
+    //     if (!user) {
+    //       return this.fail(res, 'User not found')
+    //     }
+    //     let allowSportIds: number[] = []
+    //     // 2️⃣ agar user ka AllowSport empty nahi
+    //     if (Array.isArray(user.Allowsport) && user.Allowsport.length > 0) {
+    //       allowSportIds = user.Allowsport.map(Number)
+    //     }
+    //     // 3️⃣ agar empty hai → parent ke AllowSport lo
+    //     else if (Array.isArray(user.parentStr) && user.parentStr.length > 1) {
+    //       const parentId = user.parentStr[1]
+    //       const parentUser: any = await User.findById(parentId, {
+    //         AllowSport: 1,
+    //       }).lean()
+    //       console.log(parentUser, "hjKL")
+    //       if (
+    //         parentUser &&
+    //         Array.isArray(parentUser.AllowSport) &&
+    //         parentUser.AllowSport.length > 0
+    //       ) {
+    //         allowSportIds = parentUser.AllowSport.map(Number)
+    //       }
+    //     }
+    //     // 4️⃣ final sport query
+    //     let sportFilter: any = {}
+    //     console.log(allowSportIds, "GHJK")
+    //     if (allowSportIds.length > 0) {
+    //       sportFilter = { sportId: { $in: allowSportIds } }
+    //     }
+    //     // 5️⃣ sports fetch
+    //     const sports = await Sport.find(sportFilter).lean()
+    //     return this.success(res, sports)
+    //   } catch (e: any) {
+    //     console.error(e)
+    //     return this.fail(res, e)
+    //   }
+    // }
     getSportList(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 // @ts-ignore
                 const userId = req.user._id;
-                console.log(userId, "ghjk");
-                // 1️⃣ current user
+                // 1️⃣ current user fetch
                 const user = yield User_1.User.findById(userId, {
                     Allowsport: 1,
                     parentStr: 1,
@@ -673,36 +719,36 @@ class SportsController extends ApiController_1.ApiController {
                     return this.fail(res, 'User not found');
                 }
                 let allowSportIds = [];
-                // 2️⃣ agar user ka AllowSport empty nahi
+                // 2️⃣ user ke AllowSport agar available ho
                 if (Array.isArray(user.Allowsport) && user.Allowsport.length > 0) {
                     allowSportIds = user.Allowsport.map(Number);
                 }
-                // 3️⃣ agar empty hai → parent ke AllowSport lo
+                // 3️⃣ agar user ka empty hai to parent ka lo
                 else if (Array.isArray(user.parentStr) && user.parentStr.length > 1) {
                     const parentId = user.parentStr[1];
                     const parentUser = yield User_1.User.findById(parentId, {
                         AllowSport: 1,
                     }).lean();
-                    console.log(parentUser, "hjKL");
                     if (parentUser &&
                         Array.isArray(parentUser.AllowSport) &&
                         parentUser.AllowSport.length > 0) {
                         allowSportIds = parentUser.AllowSport.map(Number);
                     }
                 }
-                // 4️⃣ final sport query
-                let sportFilter = {};
-                console.log(allowSportIds, "GHJK");
-                if (allowSportIds.length > 0) {
-                    sportFilter = { sportId: { $in: allowSportIds } };
+                console.log('FINAL allowSportIds =>', allowSportIds);
+                // 4️⃣ agar allowSport empty hai → kuch bhi mat do
+                if (allowSportIds.length === 0) {
+                    return this.success(res, []);
                 }
-                // 5️⃣ sports fetch
-                const sports = yield Sport_1.Sport.find(sportFilter).lean();
+                // 5️⃣ sports fetch (STRICT FILTER)
+                const sports = yield Sport_1.Sport.find({
+                    sportId: { $in: allowSportIds },
+                }).lean();
                 return this.success(res, sports);
             }
             catch (e) {
-                console.error(e);
-                return this.fail(res, e);
+                console.error('getSportList ERROR =>', e);
+                return this.fail(res, e.message || 'Internal Server Error');
             }
         });
     }
@@ -1069,45 +1115,129 @@ class SportsController extends ApiController_1.ApiController {
         });
     }
     // Get Match List
+    // async getMatchList(req: Request, res: Response): Promise<Response> {
+    //   try {
+    //     const { sportId, status, limit }: any = req.query
+    //     let matchQuery: any = { $match: { active: true } }
+    //     console.log(matchQuery, "match Query")
+    //     if (sportId && sportId !== 'all' && status !== 'in-play') {
+    //       matchQuery = { $match: { sportId: parseInt(sportId), active: true } }
+    //     }
+    //     if (sportId && status === 'all' && status !== 'in-play') {
+    //       matchQuery = { $match: { sportId: parseInt(sportId), active: true } }
+    //     } else if (sportId && status === 'in-play') {
+    //       matchQuery = {
+    //         $match: { sportId: parseInt(sportId), matchDateTime: { $lte: new Date() }, active: true },
+    //       }
+    //     }
+    //     let query: any = [
+    //       matchQuery,
+    //       {
+    //         $lookup: {
+    //           from: 'markets', // collection name in db
+    //           localField: 'matchId',
+    //           foreignField: 'matchId',
+    //           pipeline: [{ $match: { marketName: { $in: ['Match Odds', 'Winner'] } } }],
+    //           as: 'markets',
+    //         },
+    //       },
+    //       { $sort: { matchDateTime: 1 } },
+    //     ]
+    //     if (limit) {
+    //       query.push({ $limit: parseInt(limit) })
+    //     }
+    //     const match = await Match.aggregate(query)
+    //     // console.log(match,"match from this database site")
+    //     return this.success(res, match)
+    //   } catch (e: any) {
+    //     return this.fail(res, e)
+    //   }
+    // }
     getMatchList(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                // @ts-ignore
+                const userId = req.user._id;
                 const { sportId, status, limit } = req.query;
-                let matchQuery = { $match: { active: true } };
-                console.log(matchQuery, "match Query");
-                if (sportId && sportId !== 'all' && status !== 'in-play') {
-                    matchQuery = { $match: { sportId: parseInt(sportId), active: true } };
+                // 1️⃣ current user
+                const user = yield User_1.User.findById(userId, {
+                    Allowsport: 1,
+                    parentStr: 1,
+                }).lean();
+                if (!user) {
+                    return this.fail(res, 'User not found');
                 }
-                if (sportId && status === 'all' && status !== 'in-play') {
-                    matchQuery = { $match: { sportId: parseInt(sportId), active: true } };
+                let allowSportIds = [];
+                // 2️⃣ user AllowSport
+                if (Array.isArray(user.Allowsport) && user.Allowsport.length > 0) {
+                    allowSportIds = user.Allowsport.map(Number);
                 }
-                else if (sportId && status === 'in-play') {
-                    matchQuery = {
-                        $match: { sportId: parseInt(sportId), matchDateTime: { $lte: new Date() }, active: true },
-                    };
+                // 3️⃣ parent AllowSport
+                else if (Array.isArray(user.parentStr) && user.parentStr.length > 1) {
+                    const parentId = user.parentStr[1];
+                    const parentUser = yield User_1.User.findById(parentId, {
+                        AllowSport: 1,
+                    }).lean();
+                    if (parentUser &&
+                        Array.isArray(parentUser.AllowSport) &&
+                        parentUser.AllowSport.length > 0) {
+                        allowSportIds = parentUser.AllowSport.map(Number);
+                    }
                 }
-                let query = [
-                    matchQuery,
+                console.log('ALLOW SPORT IDS =>', allowSportIds);
+                // 4️⃣ agar allowSport empty → koi match nahi
+                if (allowSportIds.length === 0) {
+                    return this.success(res, []);
+                }
+                // 5️⃣ base match filter
+                let matchFilter = {
+                    active: true,
+                    sportId: { $in: allowSportIds }, // 🔥 MAIN LOGIC
+                };
+                // 6️⃣ agar specific sportId aaya ho
+                if (sportId && sportId !== 'all') {
+                    const sId = Number(sportId);
+                    // agar ye sport allowed hi nahi
+                    if (!allowSportIds.includes(sId)) {
+                        return this.success(res, []);
+                    }
+                    matchFilter.sportId = sId;
+                }
+                // 7️⃣ in-play logic
+                if (status === 'in-play') {
+                    matchFilter.matchDateTime = { $lte: new Date() };
+                }
+                console.log('MATCH FILTER =>', matchFilter);
+                // 8️⃣ aggregation pipeline
+                const pipeline = [
+                    { $match: matchFilter },
                     {
                         $lookup: {
                             from: 'markets',
                             localField: 'matchId',
                             foreignField: 'matchId',
-                            pipeline: [{ $match: { marketName: { $in: ['Match Odds', 'Winner'] } } }],
+                            pipeline: [
+                                {
+                                    $match: {
+                                        marketName: { $in: ['Match Odds', 'Winner'] },
+                                    },
+                                },
+                            ],
                             as: 'markets',
                         },
                     },
                     { $sort: { matchDateTime: 1 } },
                 ];
+                // 9️⃣ limit
                 if (limit) {
-                    query.push({ $limit: parseInt(limit) });
+                    pipeline.push({ $limit: Number(limit) });
                 }
-                const match = yield Match_1.Match.aggregate(query);
-                // console.log(match,"match from this database site")
+                const match = yield Match_1.Match.aggregate(pipeline);
                 return this.success(res, match);
             }
             catch (e) {
-                return this.fail(res, e);
+                console.error('getMatchList ERROR =>', e);
+                return this.fail(res, e.message || 'Internal Server Error');
             }
         });
     }

@@ -103,7 +103,7 @@ const AddUser = () => {
   };
 
   const isAllSelected =
-  selectedSports.length === sportsList.length && sportsList.length > 0
+    selectedSports.length === sportsList.length && sportsList.length > 0
 
 
   const unselectAllSports = () => {
@@ -115,7 +115,7 @@ const AddUser = () => {
   };
 
   const isAllCasinosSelected =
-  selectedCasinos.length === casinoList.length && casinoList.length > 0
+    selectedCasinos.length === casinoList.length && casinoList.length > 0
 
 
   const unselectAllCasinos = () => {
@@ -786,33 +786,33 @@ const AddUser = () => {
                     </table>
                   </div>
                 </div>
-                {userState.user.role == "admin" && (<> <div className="row m-t-20">
+                { (<> <div className="row m-t-20">
                   <div className="col-md-12">
                     <h4 className="m-b-20">Sports Access</h4>
 
                     <div className="d-flex gap-3 mb-2">
 
-{!isAllSelected && (
-  <button
-    type="button"
-    className="btn btn-sm btn-success"
-    onClick={selectAllSports}
-  >
-    Select All
-  </button>
-)}
+                      {!isAllSelected && (
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-success"
+                          onClick={selectAllSports}
+                        >
+                          Select All
+                        </button>
+                      )}
 
-{isAllSelected && (
-  <button
-    type="button"
-    className="btn btn-sm btn-danger"
-    onClick={unselectAllSports}
-  >
-    Unselect All
-  </button>
-)}
+                      {isAllSelected && (
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-danger"
+                          onClick={unselectAllSports}
+                        >
+                          Unselect All
+                        </button>
+                      )}
 
-</div>
+                    </div>
 
 
 
@@ -849,27 +849,27 @@ const AddUser = () => {
 
                       <div className="d-flex gap-3 mb-2">
 
-{!isAllCasinosSelected && (
-  <button
-    type="button"
-    className="btn btn-sm btn-success"
-    onClick={selectAllCasinos}
-  >
-    Select All
-  </button>
-)}
+                        {!isAllCasinosSelected && (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-success"
+                            onClick={selectAllCasinos}
+                          >
+                            Select All
+                          </button>
+                        )}
 
-{isAllCasinosSelected && (
-  <button
-    type="button"
-    className="btn btn-sm btn-danger"
-    onClick={unselectAllCasinos}
-  >
-    Unselect All
-  </button>
-)}
+                        {isAllCasinosSelected && (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-danger"
+                            onClick={unselectAllCasinos}
+                          >
+                            Unselect All
+                          </button>
+                        )}
 
-</div>
+                      </div>
 
 
                       <div className="row">

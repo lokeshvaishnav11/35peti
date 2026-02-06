@@ -45,7 +45,7 @@ export class SportRoutes {
       this.SportController.saveMatch,
     )
 
-    this.router.get('/get-match-list', this.SportController.getMatchList)
+    this.router.get('/get-match-list',   Passport.authenticateJWT,this.SportController.getMatchList)
 
     this.router.get(
       '/get-fancy-list',

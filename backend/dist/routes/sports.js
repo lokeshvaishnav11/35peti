@@ -27,7 +27,7 @@ class SportRoutes {
         this.router.post('/inplay-market', this.SportController.inplayMarket);
         this.router.post('/save-series', sport_validation_1.saveSeriesValidation, Http_1.default.validateRequest, this.SportController.saveSeries);
         this.router.post('/save-match', match_validation_1.saveMatchValidation, Http_1.default.validateRequest, this.SportController.saveMatch);
-        this.router.get('/get-match-list', this.SportController.getMatchList);
+        this.router.get('/get-match-list', Passport_1.default.authenticateJWT, this.SportController.getMatchList);
         this.router.get('/get-fancy-list', match_validation_1.matchIdValidation, Http_1.default.validateRequest, this.SportController.getFancyList);
         this.router.get('/get-match-by-id', Passport_1.default.authenticateJWT, match_validation_1.matchIdValidation, Http_1.default.validateRequest, this.SportController.getMatchById);
         this.router.get('/get-market-list', Passport_1.default.authenticateJWT, match_validation_1.matchIdValidation, Http_1.default.validateRequest, this.SportController.getMarketList);

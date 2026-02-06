@@ -14,9 +14,16 @@ import BetListComponent from '../../admin-app/pages/UnsetteleBetHistory/bet-list
 import { useAppSelector } from '../../redux/hooks'
 import { selectLoader } from '../../redux/actions/common/commonSlice'
 import ReactPaginate from 'react-paginate'
+import { useFormState } from 'react-hook-form'
+import { userInfo } from 'os'
+import User from '../../models/User'
+import { selectUserData } from '../../redux/actions/login/loginSlice'
+import authService from '../../services/auth.service'
+
 
 const AccountStatement = () => {
   const loadingState = useAppSelector(selectLoader)
+  const userState = useAppSelector<{ user: User }>(selectUserData)
 
   const [accountStmt, setAccountStmt] = React.useState<any>([])
   const [parseAccountStmt, setparseAccountStmt] = React.useState<any>([])
@@ -37,6 +44,7 @@ const AccountStatement = () => {
   const [pageCount, setPageCount] = useState<any>(0)
   const [itemOffset, setItemOffset] = useState<any>(0)
   const [itemsPerPage] = useState<any>(50)
+  const [user,setUser] = useState<any>()
   React.useEffect(() => {
     const filterObj = filterdata
     filterObj.startDate = moment().subtract(7, 'days').format('YYYY-MM-DD')
@@ -44,7 +52,16 @@ const AccountStatement = () => {
     setfilterdata(filterObj)
     getAccountStmt(0)
   }, [])
-
+   const [mergedList, setMergedList] = React.useState<any[]>([])
+  
+React.useEffect(()=>{
+  const getuser = async ()=>{
+   const data = await authService.getUser()
+   console.log(data.data.data.user,"FGHJK")
+   setUser(data.data.data.user)
+  }
+  getuser()
+},[])
   React.useEffect(() => {
     const endOffset = itemOffset + itemsPerPage
     setCurrentItems(parseAccountStmt.slice(itemOffset, endOffset))
@@ -56,24 +73,122 @@ const AccountStatement = () => {
     setItemOffset(newOffset)
     setPage(event.selected)
   }
-  const getAccountStmt = (page: number) => {
-    accountService
-      .getAccountList(page, filterdata)
-      .then((res) => {
-        if (res?.data?.data) setAccountStmt(res?.data?.data?.items || [])
-        if (res?.data?.data?.items && page == 0)
-          setOpenBalance(res?.data?.data?.openingBalance || 0)
-        setparseAccountStmt(
-          dataformat(res?.data?.data?.items || [], res?.data?.data?.openingBalance || 0),
-        )
+  // const getAccountStmt = (page: number) => {
+  //   accountService
+  //     .getAccountList(page, filterdata)
+  //     .then((res) => {
+  //       if (res?.data?.data) setAccountStmt(res?.data?.data?.items || [])
+  //       if (res?.data?.data?.items && page == 0)
+  //         setOpenBalance(res?.data?.data?.openingBalance || 0)
+  //       setparseAccountStmt(
+  //         dataformat(res?.data?.data?.items || [], res?.data?.data?.openingBalance || 0),
+  //       )
+  //       setPage(page)
+  //     })
+  //     .catch((e) => {
+  //       console.log(e)
+  //       // const error = e.response.data.message
+  //       toast.error('error')
+  //     })
+  // }
+
+    // const mergeAccountAndOperation = (accounts: any[], operations: any[]) => {
+    //   const accMapped = accounts.map((a) => ({
+    //     type: 'ACCOUNT',
+    //     date: new Date(a.stmt.createdAt),
+    //     row: {
+    //       date: a.date,
+    //       credit: a.amount > 0 ? a.amount : '',
+    //       debit: a.amount < 0 ? Math.abs(a.amount) : '',
+    //       balance: a.closing,
+    //       from: a.stmt.txnBy,
+    //       remark: a.narration,
+    //       allBets: a.stmt.allBets || [],
+    //     },
+    //   }))
+  
+    //   const opMapped = operations.map((o) => ({
+    //     type: 'OPERATION',
+    //     date: new Date(o.date),
+    //     row: {
+    //       date: moment(o.date).format(dateFormat),
+    //       credit: "--",
+    //       debit: "--",
+    //       balance: o.operation,
+    //       from: o.doneBy,
+    //       remark: o.description,
+    //     },
+    //   }))
+  
+    //   return [...accMapped, ...opMapped]
+    //     .sort((a, b) => b.date.getTime() - a.date.getTime())
+    // }
+
+    const mergeAccountAndOperation = (accounts: any[], operations: any[]) => {
+  const accMapped = accounts.map((a) => ({
+    type: 'ACCOUNT',
+    date: new Date(a.stmt.createdAt).getTime(), // ✅ number for sorting
+    row: {
+      date: moment(a.stmt.createdAt).format(dateFormat), // ✅ STRING
+      credit: a.amount > 0 ? a.amount : '',
+      debit: a.amount < 0 ? Math.abs(a.amount) : '',
+      balance: a.closing,
+      from: a.stmt.txnBy,
+      remark: a.narration,
+      allBets: a.stmt.allBets || [],
+    },
+  }))
+
+  const opMapped = operations.map((o) => ({
+    type: 'OPERATION',
+    date: new Date(o.date).getTime(), // ✅ number
+    row: {
+      date: moment(o.date).format(dateFormat), // ✅ STRING
+      credit: '--',
+      debit: '--',
+      balance: o.operation,
+      from: o.doneBy,
+      remark: o.description,
+    },
+  }))
+
+  return [...accMapped, ...opMapped].sort((a, b) => b.date - a.date)
+}
+
+
+    var getAccountStmt = async (page: number) => {
+      try {
+        const res = await accountService.getAccountList(page, filterdata)
+  
+        const items = res?.data?.data?.items || []
+        const openingBalance = res?.data?.data?.openingBalance || 0
+  
+        setOpenBalance(openingBalance)
+  
+        const formattedAccount = dataformat(items, openingBalance)
+  
+        // 🔥 Operation API call (username required)
+        let operationData: any[] = []
+       const data = await authService.getUser()
+       console.log(data.data.data.user,"FGHJK")
+        //   const username = filterdata?.username
+           const username = data.data.data.user?.username
+          console.log(user,"dfghjkl")
+          const opRes = await betService.postsettelement2({username})
+          operationData = opRes?.data?.data?.operations || []
+       
+  
+        const merged = mergeAccountAndOperation(formattedAccount, operationData)
+  
+        setMergedList(merged)
+        setparseAccountStmt(merged)
         setPage(page)
-      })
-      .catch((e) => {
-        console.log(e)
-        // const error = e.response.data.message
-        toast.error('error')
-      })
-  }
+  
+      } catch (err) {
+        toast.error('Error loading data')
+      }
+    }
+  
   const handleformchange = (event: any) => {
     const filterObj = filterdata
     filterObj[event.target.name] = event.target.value
@@ -116,30 +231,74 @@ const AccountStatement = () => {
     setPageBet(1)
     setIsOpen(true)
   }
+  // const getAcHtml = () => {
+  //   let closingbalance: number = page == 1 ? openBalance : closeBalance
+  //   console.log(currentItems,"sdfghjk")
+  //   const achtml =
+  //     currentItems &&
+  //     currentItems.map((stmt: any, index: number) => {
+  //       closingbalance = closingbalance + stmt.amount
+  //       return (
+  //         <tr key={`${stmt._id}${index}`}>
+  //           <td>{stmt.sr_no}</td>
+  //           <td className='wnwrap'>{stmt.date}</td>
+  //           <td className='green wnwrap'>{stmt.credit >= 0 && stmt.credit.toFixed(2)}</td>
+  //           <td className='red wnwrap'>{stmt.credit < 0 && stmt.credit.toFixed(2)}</td>
+  //           <td className='green wnwrap'>{stmt.closing}</td>
+  //        <td
+  //             className=''
+  //             onClick={(e: MouseEvent<HTMLTableCellElement>) => getBets(e, stmt.stmt)}
+  //           >
+  //             {stmt.narration || stmt.row.opreation}
+  //           </td>
+  //         </tr>
+  //       )
+  //     })
+  //   return achtml
+  // }
+
   const getAcHtml = () => {
-    let closingbalance: number = page == 1 ? openBalance : closeBalance
-    const achtml =
-      currentItems &&
-      currentItems.map((stmt: any, index: number) => {
-        closingbalance = closingbalance + stmt.amount
-        return (
-          <tr key={`${stmt._id}${index}`}>
-            <td>{stmt.sr_no}</td>
-            <td className='wnwrap'>{stmt.date}</td>
-            <td className='green wnwrap'>{stmt.credit >= 0 && stmt.credit.toFixed(2)}</td>
-            <td className='red wnwrap'>{stmt.credit < 0 && stmt.credit.toFixed(2)}</td>
-            <td className='green wnwrap'>{stmt.closing}</td>
-            <td
-              className=''
-              onClick={(e: MouseEvent<HTMLTableCellElement>) => getBets(e, stmt.stmt)}
-            >
-              {stmt.narration}
-            </td>
-          </tr>
-        )
-      })
-    return achtml
-  }
+  return (
+    currentItems &&
+    currentItems.map((stmt: any, index: number) => {
+      const row = stmt.row   // ⭐ IMPORTANT
+
+      return (
+        <tr key={index}>
+          <td>{index + 1}</td>
+
+          {/* Date */}
+          <td className='wnwrap'>{row.date}</td>
+
+          {/* Credit */}
+          <td className='green wnwrap'>
+            {row.credit !== '' ? Number(row.credit).toFixed(2) : '-'}
+          </td>
+
+          {/* Debit */}
+          <td className='red wnwrap'>
+            {row.debit !== '' ? Number(row.debit).toFixed(2) : '-'}
+          </td>
+
+          {/* Balance */}
+          <td className='green wnwrap'>
+            {row.balance !== undefined ? Number(row.balance).toFixed(2) : '-'}
+          </td>
+
+          {/* Remark */}
+          <td
+            onClick={(e) =>
+              stmt.type === 'ACCOUNT' && getBets(e, row)
+            }
+          >
+            {row.remark}
+          </td>
+        </tr>
+      )
+    })
+  )
+}
+
 
   const dataformat = (response: any, closingbalance: any) => {
     const aryNewFormat: any = []

@@ -740,6 +740,7 @@ const AccountStatementAdmin = () => {
                       <option value='chip'>Deposit / Withdraw</option>
                       <option value='sgame'>Sport Report</option>
                       <option value='cgame'>Casino Report</option>
+                      <option value='change'>Change Password Report</option>
                     </select>
                   </div>
 
