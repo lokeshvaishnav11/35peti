@@ -39,7 +39,10 @@ const MatchDetail = (props: any) => {
             <div className='game-heading'>
               <span className='card-header-title'>{props.currentMatch?.name}</span>
               <span className='float-right card-header-date'>
-                {moment(props.currentMatch?.matchDateTime).format('MM/DD/YYYY  h:mm a')}
+               
+                {
+                                        moment(props.currentMatch?.matchDateTime.slice(0, 19)).format('MM/DD/YYYY  h:mm a')}
+                                       
               </span>
             </div>
             {props.scoreBoard()}

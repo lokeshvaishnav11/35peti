@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment from "moment-timezone";
 import React, { MouseEvent } from "react";
 import ReactPaginate from "react-paginate";
 import { toast } from "react-toastify";

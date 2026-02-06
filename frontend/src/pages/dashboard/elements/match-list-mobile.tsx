@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import LMatch from '../../../models/LMatch'
-import moment from 'moment'
+import moment from 'moment-timezone'
 import { dateFormat } from '../../../utils/helper'
 import { useLocation } from 'react-router-dom'
 
@@ -24,29 +24,35 @@ const MatchListMobile = (props: any) => {
               return (
                 <Fragment key={match.matchId}>
                   <tr>
-                    <td colSpan={4}  onClick={() => props.currentMatch(match)}>
+                    <td colSpan={4} onClick={() => props.currentMatch(match)}>
                       <div className='game-name'>
                         <a
-                         
+
                           className='text-edark'
                           href={undefined}
                         >
                           {match.name}
                         </a>
                         <p className='tx-666 tx-12' style={{ marginTop: '3px' }}>
-                          {moment(match.matchDateTime).format(dateFormat)}
+                          {
+                            moment(match.matchDateTime.slice(0, 19))
+                              .format(dateFormat)
+                          }
+
                         </p>
                       </div>
                     </td>
                     <td colSpan={2}>
                       <div className='game-icons' style={{ paddingRight: '0px' }}>
-                        {new Date(match.matchDateTime).getTime() < new Date().getTime() && (
-                          <span className='game-icon'>
-                            <i className='fas fa-circle v-m icon-circle tx-green' />
-                          </span>
-                        )}
+                        {moment(match.matchDateTime.slice(0, 19))
+                          .isBefore(moment()) && (
+                            <span className="game-icon">
+                              <i className="fas fa-circle v-m icon-circle tx-green" />
+                            </span>
+                          )}
+
                         <span className='game-icon'>
-                         Live  <i className='fas fa-tv v-m icon-tv' />
+                          Live  <i className='fas fa-tv v-m icon-tv' />
                         </span>
                         {match.isFancy && (
                           <span className='game-icon'>

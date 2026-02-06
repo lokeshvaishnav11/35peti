@@ -16,7 +16,7 @@ import { useWebsocketUser } from "../../../context/webSocketUser";
 import Pdf from "react-to-pdf";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
-import moment from "moment";
+import moment from "moment-timezone";
 import { useAppSelector } from "../../../redux/hooks";
 import { selectUserData } from "../../../redux/actions/login/loginSlice";
 import GeneralSettingsModal from "./modals/GeneralSettingsModal";

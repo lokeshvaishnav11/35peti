@@ -1,6 +1,7 @@
 import React from 'react'
 import LMatch from '../../../models/LMatch'
-import moment from 'moment'
+import moment from "moment-timezone";
+
 import { dateFormat } from '../../../utils/helper'
 
 interface MatchListProps {
@@ -26,21 +27,24 @@ const MatchList: React.FC<MatchListProps> = ({ matchList, currentMatch, memoOdds
               match?.markets && match?.markets?.length > 0 ? match?.markets[0].marketId : null
             return (
               <tr key={match.matchId}>
-                <td  onClick={() => currentMatch(match)}>
+                <td onClick={() => currentMatch(match)}>
                   <div className='game-name'>
                     <a
-                     
+
                       className='text-dark'
                       href={undefined}
                     >
-                      {match.name} / {moment(match.matchDateTime).format(dateFormat)}
-                    </a>
+                      {match.name} / {
+                        moment(match.matchDateTime.slice(0, 19))
+                          .format(dateFormat)
+                      }                    </a>
                   </div>
                   <div className='game-icons'>
-                    <span className='game-icon'>
-                      {new Date(match.matchDateTime).getTime() < new Date().getTime() && (
-                        <span className='active' />
-                      )}
+                    <span className="game-icon">
+                      {moment(match.matchDateTime.slice(0, 19))
+                        .isBefore(moment()) && (
+                          <span className="active" />
+                        )}
                     </span>
 
                     <span className='game-icon'>
