@@ -796,26 +796,26 @@ const ListClients = () => {
                           onChange={handleSelectAll}
                         />
                       </th> */}
-                        <th>Sr</th>
+                        {/* <th>Sr</th> */}
                       <th>User Name</th>
                       <th>Credit Referance</th>
-                      <th>Balance</th>
-                      <th>Client (P/L)</th>
+                      {/* <th>Balance</th>
+                      <th>Client (P/L)</th> */}
                       <th>Exposure</th>
-                      <th>Available Balance</th>
+                      {/* <th>Available Balance</th> */}
                       <th className="noExport">U St</th>
                       <th className="noExport">B St</th>
-                      <th className="noExport">B2 St</th>
+                      <th className="noExport">C.Bet</th>
                       <th>Exposure Limit</th>
                       <th>Default %</th>
                       <th>Account Type</th>
-                       <th>Sr</th>
+                       {/* <th>Sr</th> */}
                       <th className="noExport">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      {/* <th></th> */}
+                    {/* <tr>
+                       <th></th>
                       <th>Total</th>
                       <th>{usersTotal.totalcr.toFixed(2)}</th>
                       <th>{usersTotal.totalbalance.toFixed(2)}</th>
@@ -828,7 +828,8 @@ const ListClients = () => {
                       <th></th>
                       <th></th>
                       <th className="noExport"></th>
-                    </tr>
+                    </tr> */}
+                    <tr> <th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>
                     {users?.items?.map((user: User, index: number) => {
                       if (
                         activeDeactive !== user.isLogin &&
@@ -844,9 +845,9 @@ const ListClients = () => {
                               onChange={() => handleSelectItem?.(user)}
                             />
                           </td> */}
-                           <td>
+                           {/* <td>
                             {index +1}
-                          </td>
+                          </td> */}
                           <td>
                             {user.role !== RoleType.user && (
                               <CustomLink to={`/list-clients/${user.username}`}>
@@ -860,7 +861,7 @@ const ListClients = () => {
                           <td>
                             {user?.creditRefrences ? user.creditRefrences : 0}
                           </td>
-                          <td>{mainBalance(user)}</td>
+                          {/* <td>{mainBalance(user)}</td>
                           <td
                             className={
                               user?.balance?.profitLoss &&
@@ -870,8 +871,8 @@ const ListClients = () => {
                             }
                           >
                             {user?.balance?.profitLoss?.toFixed(2) || 0}
-                          </td>
-                          <td>{finalExposer(user?.balance)}</td>
+                          </td> */}
+                          {/* <td>{finalExposer(user?.balance)}</td> */}
                           <td>
                             {(
                               (user.balance?.balance || 0) -
@@ -921,9 +922,9 @@ const ListClients = () => {
                           <td>{user.exposerLimit ? user.exposerLimit : 0}</td>
                           <td>{getcurrentpartnership(user)}</td>
                           <td>{RoleName[user.role!]}</td>
-                           <td>
+                           {/* <td>
                             {index +1}
-                          </td>
+                          </td> */}
                           <td>
                             <a
                               onClick={() => {

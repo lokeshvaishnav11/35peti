@@ -319,6 +319,7 @@ class DealersController extends ApiController_1.ApiController {
                 {
                     $project: select,
                 },
+                { $sort: { username: 1 } },
             ];
             let filters = [];
             if (username && search !== 'true') {
@@ -331,6 +332,7 @@ class DealersController extends ApiController_1.ApiController {
                         },
                     },
                     ...aggregateFilter,
+                    { $sort: { username: 1 } },
                 ], pageLimit);
             }
             else if (search === 'true' && type) {
@@ -343,6 +345,7 @@ class DealersController extends ApiController_1.ApiController {
                         },
                     },
                     ...aggregateFilter,
+                    { $sort: { username: 1 } },
                 ], pageLimit);
             }
             else if (username && search === 'true') {
@@ -354,6 +357,7 @@ class DealersController extends ApiController_1.ApiController {
                         },
                     },
                     ...aggregateFilter,
+                    { $sort: { username: 1 } },
                 ], pageLimit);
             }
             else {
@@ -367,19 +371,20 @@ class DealersController extends ApiController_1.ApiController {
                             },
                         },
                         ...aggregateFilter,
+                        { $sort: { username: 1 } },
                     ], pageLimit);
                 }
                 else {
                     if (role !== 'admin') {
-                        filters = (0, aggregation_pipeline_pagination_1.paginationPipeLine)(pageNo, [{ $match: { parentId: mongoose_1.Types.ObjectId(_id) } }, ...aggregateFilter], pageLimit);
+                        filters = (0, aggregation_pipeline_pagination_1.paginationPipeLine)(pageNo, [{ $match: { parentId: mongoose_1.Types.ObjectId(_id) } }, ...aggregateFilter, { $sort: { username: 1 } },], pageLimit);
                     }
                     else {
                         console.log(_id);
-                        filters = (0, aggregation_pipeline_pagination_1.paginationPipeLine)(pageNo, [{ $match: { _id: mongoose_1.Types.ObjectId(_id) } }, ...aggregateFilter], pageLimit);
+                        filters = (0, aggregation_pipeline_pagination_1.paginationPipeLine)(pageNo, [{ $match: { _id: mongoose_1.Types.ObjectId(_id) } }, ...aggregateFilter, { $sort: { username: 1 } },], pageLimit);
                     }
                 }
             }
-            const users = yield User_1.User.aggregate(filters);
+            const users = yield User_1.User.aggregate(filters).collation({ locale: 'en', numericOrdering: true });
             return this.success(res, Object.assign({}, users[0]));
         });
     }

@@ -390,7 +390,7 @@ React.useEffect(()=>{
               </div>
             </form>
             <div className='table-responsive'>
-              <table className='text-center' id='customers1'>
+              <table style={{zoom:"0.5"}} className='text-center' id='customers1'>
                 <thead>
                   <tr>
                     <th style={{ width: '10%', textAlign: 'center', whiteSpace: 'nowrap' }}>

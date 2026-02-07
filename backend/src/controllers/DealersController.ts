@@ -279,6 +279,7 @@ export class DealersController extends ApiController {
       {
         $project: select,
       },
+      { $sort: { username: 1 } },
     ]
     let filters: any = []
 
@@ -294,6 +295,7 @@ export class DealersController extends ApiController {
             },
           },
           ...aggregateFilter,
+          { $sort: { username: 1 } },
         ],
         pageLimit,
       )
@@ -309,6 +311,7 @@ export class DealersController extends ApiController {
             },
           },
           ...aggregateFilter,
+          { $sort: { username: 1 } },
         ],
         pageLimit,
       )
@@ -323,6 +326,7 @@ export class DealersController extends ApiController {
             },
           },
           ...aggregateFilter,
+          { $sort: { username: 1 } },
         ],
         pageLimit,
       )
@@ -339,6 +343,7 @@ export class DealersController extends ApiController {
               },
             },
             ...aggregateFilter,
+            { $sort: { username: 1 } },
           ],
           pageLimit,
         )
@@ -346,20 +351,20 @@ export class DealersController extends ApiController {
         if (role !== 'admin') {
           filters = paginationPipeLine(
             pageNo,
-            [{ $match: { parentId: Types.ObjectId(_id) } }, ...aggregateFilter],
+            [{ $match: { parentId: Types.ObjectId(_id) } }, ...aggregateFilter ,  { $sort: { username: 1 } },],
             pageLimit,
           )
         } else {
           console.log(_id)
           filters = paginationPipeLine(
             pageNo,
-            [{ $match: { _id: Types.ObjectId(_id) } }, ...aggregateFilter],
+            [{ $match: { _id: Types.ObjectId(_id) } }, ...aggregateFilter, { $sort: { username: 1 } },],
             pageLimit,
           )
         }
       }
     }
-    const users = await User.aggregate(filters)
+    const users = await User.aggregate(filters).collation({ locale: 'en', numericOrdering: true })
     return this.success(res, { ...users[0] })
   }
 

@@ -24,6 +24,13 @@ const AdminDashboard = () => {
         <tr key={index}>
           <td>
             <div>
+             
+                {Item.sportName}
+        
+            </div>
+          </td>
+          <td>
+            <div>
               <a href={`/admin/odds/${Item.matchId}`}>
                 {Item.matchName} ({Item.betCount})
               </a>
@@ -91,10 +98,13 @@ const AdminDashboard = () => {
         <div className='row'>
           <div className='col-md-12 main-container'>
             <div className='card-body'>
-              <div className='table-responsive data-table' style={{ overflow: 'hidden' }}>
+              <div className='table-responsive data-table' style={{ overflow: 'auto' }}>
                 <table className='table table-bordered'>
                   <thead>
                     <tr>
+                    <th className='bg2 text-white' style={{ padding: '10px' }}>
+                        Sports Name
+                      </th>
                       <th className='bg2 text-white' style={{ padding: '10px' }}>
                         Event Name
                       </th>
