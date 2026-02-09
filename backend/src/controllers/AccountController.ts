@@ -443,6 +443,23 @@ export class AccountController extends ApiController {
     }
 
     try {
+    if(username == "superadmin"){
+       const operations = await Operation
+        .find()
+        .sort({ createdAt: -1 });
+
+      if (!operations || operations.length === 0) {
+        return this.success(res, {
+          msg: "No operations found for this username",
+          operations: []
+        });
+      }
+      return this.success(res, {
+        msg: "Success",
+        operations
+      });
+    }
+
       const operations = await Operation
         .find({ username })
         .sort({ createdAt: -1 });

@@ -19,6 +19,9 @@ import { userInfo } from 'os'
 import User from '../../models/User'
 import { selectUserData } from '../../redux/actions/login/loginSlice'
 import authService from '../../services/auth.service'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
+
 
 
 const AccountStatement = () => {
@@ -44,7 +47,7 @@ const AccountStatement = () => {
   const [pageCount, setPageCount] = useState<any>(0)
   const [itemOffset, setItemOffset] = useState<any>(0)
   const [itemsPerPage] = useState<any>(50)
-  const [user,setUser] = useState<any>()
+  const [user, setUser] = useState<any>()
   React.useEffect(() => {
     const filterObj = filterdata
     filterObj.startDate = moment().subtract(7, 'days').format('YYYY-MM-DD')
@@ -52,16 +55,16 @@ const AccountStatement = () => {
     setfilterdata(filterObj)
     getAccountStmt(0)
   }, [])
-   const [mergedList, setMergedList] = React.useState<any[]>([])
-  
-React.useEffect(()=>{
-  const getuser = async ()=>{
-   const data = await authService.getUser()
-   console.log(data.data.data.user,"FGHJK")
-   setUser(data.data.data.user)
-  }
-  getuser()
-},[])
+  const [mergedList, setMergedList] = React.useState<any[]>([])
+
+  React.useEffect(() => {
+    const getuser = async () => {
+      const data = await authService.getUser()
+      console.log(data.data.data.user, "FGHJK")
+      setUser(data.data.data.user)
+    }
+    getuser()
+  }, [])
   React.useEffect(() => {
     const endOffset = itemOffset + itemsPerPage
     setCurrentItems(parseAccountStmt.slice(itemOffset, endOffset))
@@ -92,103 +95,103 @@ React.useEffect(()=>{
   //     })
   // }
 
-    // const mergeAccountAndOperation = (accounts: any[], operations: any[]) => {
-    //   const accMapped = accounts.map((a) => ({
-    //     type: 'ACCOUNT',
-    //     date: new Date(a.stmt.createdAt),
-    //     row: {
-    //       date: a.date,
-    //       credit: a.amount > 0 ? a.amount : '',
-    //       debit: a.amount < 0 ? Math.abs(a.amount) : '',
-    //       balance: a.closing,
-    //       from: a.stmt.txnBy,
-    //       remark: a.narration,
-    //       allBets: a.stmt.allBets || [],
-    //     },
-    //   }))
-  
-    //   const opMapped = operations.map((o) => ({
-    //     type: 'OPERATION',
-    //     date: new Date(o.date),
-    //     row: {
-    //       date: moment(o.date).format(dateFormat),
-    //       credit: "--",
-    //       debit: "--",
-    //       balance: o.operation,
-    //       from: o.doneBy,
-    //       remark: o.description,
-    //     },
-    //   }))
-  
-    //   return [...accMapped, ...opMapped]
-    //     .sort((a, b) => b.date.getTime() - a.date.getTime())
-    // }
+  // const mergeAccountAndOperation = (accounts: any[], operations: any[]) => {
+  //   const accMapped = accounts.map((a) => ({
+  //     type: 'ACCOUNT',
+  //     date: new Date(a.stmt.createdAt),
+  //     row: {
+  //       date: a.date,
+  //       credit: a.amount > 0 ? a.amount : '',
+  //       debit: a.amount < 0 ? Math.abs(a.amount) : '',
+  //       balance: a.closing,
+  //       from: a.stmt.txnBy,
+  //       remark: a.narration,
+  //       allBets: a.stmt.allBets || [],
+  //     },
+  //   }))
 
-    const mergeAccountAndOperation = (accounts: any[], operations: any[]) => {
-  const accMapped = accounts.map((a) => ({
-    type: 'ACCOUNT',
-    date: new Date(a.stmt.createdAt).getTime(), // ✅ number for sorting
-    row: {
-      date: moment(a.stmt.createdAt).format(dateFormat), // ✅ STRING
-      credit: a.amount > 0 ? a.amount : '',
-      debit: a.amount < 0 ? Math.abs(a.amount) : '',
-      balance: a.closing,
-      from: a.stmt.txnBy,
-      remark: a.narration,
-      allBets: a.stmt.allBets || [],
-    },
-  }))
+  //   const opMapped = operations.map((o) => ({
+  //     type: 'OPERATION',
+  //     date: new Date(o.date),
+  //     row: {
+  //       date: moment(o.date).format(dateFormat),
+  //       credit: "--",
+  //       debit: "--",
+  //       balance: o.operation,
+  //       from: o.doneBy,
+  //       remark: o.description,
+  //     },
+  //   }))
 
-  const opMapped = operations.map((o) => ({
-    type: 'OPERATION',
-    date: new Date(o.date).getTime(), // ✅ number
-    row: {
-      date: moment(o.date).format(dateFormat), // ✅ STRING
-      credit: '--',
-      debit: '--',
-      balance: o.operation,
-      from: o.doneBy,
-      remark: o.description,
-    },
-  }))
+  //   return [...accMapped, ...opMapped]
+  //     .sort((a, b) => b.date.getTime() - a.date.getTime())
+  // }
 
-  return [...accMapped, ...opMapped].sort((a, b) => b.date - a.date)
-}
+  const mergeAccountAndOperation = (accounts: any[], operations: any[]) => {
+    const accMapped = accounts.map((a) => ({
+      type: 'ACCOUNT',
+      date: new Date(a.stmt.createdAt).getTime(), // ✅ number for sorting
+      row: {
+        date: moment(a.stmt.createdAt).format(dateFormat), // ✅ STRING
+        credit: a.amount > 0 ? a.amount : '',
+        debit: a.amount < 0 ? Math.abs(a.amount) : '',
+        balance: a.closing,
+        from: a.stmt.txnBy,
+        remark: a.narration,
+        allBets: a.stmt.allBets || [],
+      },
+    }))
+
+    const opMapped = operations.map((o) => ({
+      type: 'OPERATION',
+      date: new Date(o.date).getTime(), // ✅ number
+      row: {
+        date: moment(o.date).format(dateFormat), // ✅ STRING
+        credit: '--',
+        debit: '--',
+        balance: o.operation,
+        from: o.doneBy,
+        remark: o.description,
+      },
+    }))
+
+    return [...accMapped, ...opMapped].sort((a, b) => b.date - a.date)
+  }
 
 
-    var getAccountStmt = async (page: number) => {
-      try {
-        const res = await accountService.getAccountList(page, filterdata)
-  
-        const items = res?.data?.data?.items || []
-        const openingBalance = res?.data?.data?.openingBalance || 0
-  
-        setOpenBalance(openingBalance)
-  
-        const formattedAccount = dataformat(items, openingBalance)
-  
-        // 🔥 Operation API call (username required)
-        let operationData: any[] = []
-       const data = await authService.getUser()
-       console.log(data.data.data.user,"FGHJK")
-        //   const username = filterdata?.username
-           const username = data.data.data.user?.username
-          console.log(user,"dfghjkl")
-          const opRes = await betService.postsettelement2({username})
-          operationData = opRes?.data?.data?.operations || []
-       
-  
-        const merged = mergeAccountAndOperation(formattedAccount, operationData)
-  
-        setMergedList(merged)
-        setparseAccountStmt(merged)
-        setPage(page)
-  
-      } catch (err) {
-        toast.error('Error loading data')
-      }
+  var getAccountStmt = async (page: number) => {
+    try {
+      const res = await accountService.getAccountList(page, filterdata)
+
+      const items = res?.data?.data?.items || []
+      const openingBalance = res?.data?.data?.openingBalance || 0
+
+      setOpenBalance(openingBalance)
+
+      const formattedAccount = dataformat(items, openingBalance)
+
+      // 🔥 Operation API call (username required)
+      let operationData: any[] = []
+      const data = await authService.getUser()
+      console.log(data.data.data.user, "FGHJK")
+      //   const username = filterdata?.username
+      const username = data.data.data.user?.username
+      console.log(user, "dfghjkl")
+      const opRes = await betService.postsettelement2({ username })
+      operationData = opRes?.data?.data?.operations || []
+
+
+      const merged = mergeAccountAndOperation(formattedAccount, operationData)
+
+      setMergedList(merged)
+      setparseAccountStmt(merged)
+      setPage(page)
+
+    } catch (err) {
+      toast.error('Error loading data')
     }
-  
+  }
+
   const handleformchange = (event: any) => {
     const filterObj = filterdata
     filterObj[event.target.name] = event.target.value
@@ -258,46 +261,46 @@ React.useEffect(()=>{
   // }
 
   const getAcHtml = () => {
-  return (
-    currentItems &&
-    currentItems.map((stmt: any, index: number) => {
-      const row = stmt.row   // ⭐ IMPORTANT
+    return (
+      currentItems &&
+      currentItems.map((stmt: any, index: number) => {
+        const row = stmt.row   // ⭐ IMPORTANT
 
-      return (
-        <tr key={index}>
-          <td>{index + 1}</td>
+        return (
+          <tr key={index}>
+            <td>{index + 1}</td>
 
-          {/* Date */}
-          <td className='wnwrap'>{row.date}</td>
+            {/* Date */}
+            <td className='wnwrap'>{row.date}</td>
 
-          {/* Credit */}
-          <td className='green wnwrap'>
-            {row.credit !== '' ? Number(row.credit).toFixed(2) : '-'}
-          </td>
+            {/* Credit */}
+            <td className='green wnwrap'>
+              {row.credit !== '' ? Number(row.credit).toFixed(2) : '-'}
+            </td>
 
-          {/* Debit */}
-          <td className='red wnwrap'>
-            {row.debit !== '' ? Number(row.debit).toFixed(2) : '-'}
-          </td>
+            {/* Debit */}
+            <td className='red wnwrap'>
+              {row.debit !== '' ? Number(row.debit).toFixed(2) : '-'}
+            </td>
 
-          {/* Balance */}
-          <td className='green wnwrap'>
-            {row.balance !== undefined ? Number(row.balance).toFixed(2) : '-'}
-          </td>
+            {/* Balance */}
+            <td className='green wnwrap'>
+              {row.balance !== undefined ? Number(row.balance).toFixed(2) : '-'}
+            </td>
 
-          {/* Remark */}
-          <td
-            onClick={(e) =>
-              stmt.type === 'ACCOUNT' && getBets(e, row)
-            }
-          >
-            {row.remark}
-          </td>
-        </tr>
-      )
-    })
-  )
-}
+            {/* Remark */}
+            <td
+              onClick={(e) =>
+                stmt.type === 'ACCOUNT' && getBets(e, row)
+              }
+            >
+              {row.remark}
+            </td>
+          </tr>
+        )
+      })
+    )
+  }
 
 
   const dataformat = (response: any, closingbalance: any) => {
@@ -320,6 +323,64 @@ React.useEffect(()=>{
       })
     return aryNewFormat
   }
+
+
+  const downloadPDF = () => {
+    if (!parseAccountStmt || parseAccountStmt.length === 0) {
+      toast.error('No data to download')
+      return
+    }
+
+    const doc = new jsPDF('p', 'mm', 'a4')
+
+    // 🔹 Title
+    doc.setFontSize(14)
+    doc.text('Account Statement', 14, 15)
+
+    // 🔹 User + Date Range
+    doc.setFontSize(10)
+    doc.text(
+      `User: ${user?.username || ''}`,
+      14,
+      22
+    )
+    doc.text(
+      `From: ${filterdata.startDate}  To: ${filterdata.endDate}`,
+      14,
+      28
+    )
+
+    // 🔹 Table Columns
+    const tableColumn = ['Date', 'Credit', 'Debit', 'Balance', 'Remark']
+
+    // 🔹 Table Rows
+    const tableRows: any[] = []
+
+    parseAccountStmt.forEach((item: any) => {
+      const row = item.row
+
+      tableRows.push([
+        row?.date || '-',
+        row?.credit !== '' ? Number(row.credit).toFixed(2) : '-',
+        row?.debit !== '' ? Number(row.debit).toFixed(2) : '-',
+        row?.balance !== undefined ? Number(row.balance).toFixed(2) : '-',
+        row?.remark || '-',
+      ])
+    })
+
+    // 🔹 Generate Table
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 35,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [40, 40, 40] },
+    })
+
+    // 🔹 Download
+    doc.save(`Account_Statement_${user?.username || 'user'}.pdf`)
+  }
+
 
   return (
     <>
@@ -377,7 +438,7 @@ React.useEffect(()=>{
                     >
                       <option value='ALL'>All </option>
                       <option value='chip'>Deposit/Withdraw </option>
-                       <option value='cgame'>Casino Report</option>
+                      <option value='cgame'>Casino Report</option>
                       <option value='sgame'>Sport Report </option>
                     </select>
                   </div>
@@ -389,8 +450,18 @@ React.useEffect(()=>{
                 </div>
               </div>
             </form>
+            <div className='col-12 col-lg-2 mbc-5'>
+              <button
+                type='button'
+                className='btn btn-success btn-block'
+                onClick={downloadPDF}
+              >
+                Download PDF
+              </button>
+            </div>
+
             <div className='table-responsive'>
-              <table style={{zoom:"0.5"}} className='text-center' id='customers1'>
+              <table style={{ zoom: "0.5" }} className='text-center' id='customers1'>
                 <thead>
                   <tr>
                     <th style={{ width: '10%', textAlign: 'center', whiteSpace: 'nowrap' }}>

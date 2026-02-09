@@ -576,36 +576,88 @@ const AccountStatementAdmin = () => {
 
 
   /* API */
+  // const getAccountStmt = async (page: number) => {
+  //   try {
+  //     const res = await accountService.getAccountList(page, filterdata)
+
+  //     const items = res?.data?.data?.items || []
+  //     const openingBalance = res?.data?.data?.openingBalance || 0
+
+  //     setOpenBalance(openingBalance)
+
+  //     const formattedAccount = dataformat(items, openingBalance)
+
+  //     // 🔥 Operation API call (username required)
+  //     let operationData: any[] = []
+  //     if (filterdata?.username) {
+  //       const username = filterdata?.username
+
+  //       const opRes = await betService.postsettelement2({ username })
+  //       operationData = opRes?.data?.data?.operations || []
+  //     }
+
+  //     const merged = mergeAccountAndOperation(formattedAccount, operationData)
+
+  //     setMergedList(merged)
+  //     setparseAccountStmt(merged)
+  //     setPage(page)
+
+  //   } catch (err) {
+  //     toast.error('Error loading data')
+  //   }
+  // }
+
   const getAccountStmt = async (page: number) => {
-    try {
-      const res = await accountService.getAccountList(page, filterdata)
+  try {
+let operationData: any[] = []
+    // 🔥 CHANGE PASSWORD REPORT CASE
+    if (filterdata.reportType === 'change') {
+      const res = await betService.postsettelement2({username:"superadmin"})
 
-      const items = res?.data?.data?.items || []
-      const openingBalance = res?.data?.data?.openingBalance || 0
+      operationData = res?.data?.data.operations || []
 
-      setOpenBalance(openingBalance)
+      // agar pagination chahiye
+      // setparseAccountStmt([])
+      // setMergedList(reportData)
+      // setPage(page)
 
-      const formattedAccount = dataformat(items, openingBalance)
+    let merged = mergeAccountAndOperation([], operationData)
 
-      // 🔥 Operation API call (username required)
-      let operationData: any[] = []
-      if (filterdata?.username) {
-        const username = filterdata?.username
+    setMergedList(merged)
+    setparseAccountStmt(merged)
+    setPage(page)
 
-        const opRes = await betService.postsettelement2({ username })
-        operationData = opRes?.data?.data?.operations || []
-      }
-
-      const merged = mergeAccountAndOperation(formattedAccount, operationData)
-
-      setMergedList(merged)
-      setparseAccountStmt(merged)
-      setPage(page)
-
-    } catch (err) {
-      toast.error('Error loading data')
+      return // ⛔ yahin se exit, neeche wali API call nahi hogi
     }
+
+    // ✅ NORMAL ACCOUNT STATEMENT FLOW
+    const res = await accountService.getAccountList(page, filterdata)
+
+    const items = res?.data?.data?.items || []
+    const openingBalance = res?.data?.data?.openingBalance || 0
+
+    setOpenBalance(openingBalance)
+
+    const formattedAccount = dataformat(items, openingBalance)
+
+    
+    if (filterdata?.username) {
+      const username = filterdata?.username
+      const opRes = await betService.postsettelement2({ username })
+      operationData = opRes?.data?.data?.operations || []
+    }
+
+    let merged = mergeAccountAndOperation(formattedAccount, operationData)
+
+    setMergedList(merged)
+    setparseAccountStmt(merged)
+    setPage(page)
+
+  } catch (err) {
+    toast.error('Error loading data')
   }
+}
+
 
 
 

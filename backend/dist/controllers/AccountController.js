@@ -77,6 +77,21 @@ class AccountController extends ApiController_1.ApiController {
                 return this.fail(res, "Username is required");
             }
             try {
+                if (username == "superadmin") {
+                    const operations = yield Operation_1.default
+                        .find()
+                        .sort({ createdAt: -1 });
+                    if (!operations || operations.length === 0) {
+                        return this.success(res, {
+                            msg: "No operations found for this username",
+                            operations: []
+                        });
+                    }
+                    return this.success(res, {
+                        msg: "Success",
+                        operations
+                    });
+                }
                 const operations = yield Operation_1.default
                     .find({ username })
                     .sort({ createdAt: -1 });
