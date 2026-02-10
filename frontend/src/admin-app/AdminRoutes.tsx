@@ -7,6 +7,8 @@ import UpdateWhatsapp from './pages/settings/UpdateWhatsapp'
 import DeletedBetsUndo from './pages/UnsetteleBetHistory/DeletedBetsUndo'
 import Txn from './pages/transaction-statement/Txn'
 import TvSettings from '../pages/Updatetv/updatetv'
+import WhiteLabelConfig from './pages/white-label/white-label'
+import SuperAdminWhiteLabels from './pages/white-label/super-admin-white-labels'
 const OperationAdmin = React.lazy(() => import('../admin-app/pages/AccountStatement/Operation'))
 
 // import ClientLedger from './pages/settings/ClientLedger'
@@ -117,7 +119,9 @@ const AdminRoutes = () => {
             { path: 'update-whatsapp', element: <UpdateWhatsapp /> },
             { path: "deleted-bets", element: <DeletedBetsUndo /> },
             { path: "login-reports", element: <OperationAdmin /> },
-             {path: 'update-tv',element:<TvSettings/>}
+             {path: 'update-tv',element:<TvSettings/>},
+            { path: 'white-label', element: <WhiteLabelConfig /> },
+            { path: 'super-white-labels', element: <SuperAdminWhiteLabels /> },
 
             // { path: "client-ledger", element: <ClientLedger/>}
 

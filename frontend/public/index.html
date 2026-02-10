@@ -36,6 +36,37 @@
 
 
 
+  <style>
+    :root {
+      --primary-color: #007bff;
+      --secondary-color: #6c757d;
+      --background-color: #ffffff;
+      --text-color: #212529;
+      --font-family: 'Arial, sans-serif';
+    }
+    
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      font-family: var(--font-family);
+    }
+    
+    /* Common themeable elements */
+    .btn-primary {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      border-color: var(--secondary-color);
+    }
+    
+    .card {
+      background-color: var(--background-color);
+      color: var(--text-color);
+    }
+  </style>
   <script>
     addCss()
     let prevUrl = undefined

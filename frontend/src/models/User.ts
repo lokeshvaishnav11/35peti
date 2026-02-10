@@ -43,6 +43,7 @@ export default interface User {
   logs?: string
   transactionPassword?: string
   selected?: boolean
+  whiteLabelId?: string
   [key: string]: any
  
  

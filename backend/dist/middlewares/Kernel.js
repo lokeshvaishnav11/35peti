@@ -7,6 +7,7 @@ const CORS_1 = __importDefault(require("./CORS"));
 const Http_1 = __importDefault(require("./Http"));
 const Statics_1 = __importDefault(require("./Statics"));
 const StatusMonitor_1 = __importDefault(require("./StatusMonitor"));
+const WhiteLabelMiddleware_1 = require("./WhiteLabelMiddleware");
 const Locals_1 = __importDefault(require("../providers/Locals"));
 class Kernel {
     static init(_express) {
@@ -21,6 +22,8 @@ class Kernel {
         _express = Statics_1.default.mount(_express);
         // Mount status monitor middleware
         _express = StatusMonitor_1.default.mount(_express);
+        // Mount white-label middleware
+        _express.use(WhiteLabelMiddleware_1.whiteLabelMiddleware);
         //Post middleware
         _express.use(Http_1.default.postMiddleware);
         return _express;

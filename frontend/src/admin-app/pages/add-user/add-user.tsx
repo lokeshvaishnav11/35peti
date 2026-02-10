@@ -58,6 +58,17 @@ const AddUser = () => {
 
   const [isUnlimited, setIsUnlimited] = React.useState(false);
   const { username } = useParams()
+  
+  // Refs for white-label configuration
+  const whiteLabelDomainRef = React.useRef<HTMLInputElement>(null);
+  const whiteLabelCompanyNameRef = React.useRef<HTMLInputElement>(null);
+  const whiteLabelLogoUrlRef = React.useRef<HTMLInputElement>(null);
+  const whiteLabelFaviconUrlRef = React.useRef<HTMLInputElement>(null);
+  const whiteLabelPrimaryColorRef = React.useRef<HTMLInputElement>(null);
+  const whiteLabelSecondaryColorRef = React.useRef<HTMLInputElement>(null);
+  const whiteLabelBackgroundColorRef = React.useRef<HTMLInputElement>(null);
+  const whiteLabelTextColorRef = React.useRef<HTMLInputElement>(null);
+  const whiteLabelIsActiveRef = React.useRef<HTMLSelectElement>(null);
 
   const [sportsList, setSportsList] = React.useState<any[]>([])
   const [casinoList, setCasinoList] = React.useState<any[]>([])
@@ -133,6 +144,7 @@ const AddUser = () => {
     reset,
     getValues,
     setValue,
+    watch,
     // setError,
     formState: { errors },
   } = useForm<User>({
@@ -230,6 +242,37 @@ const AddUser = () => {
       delete data.Allowsport;
       delete data.AllowCasino;
     }
+    // Collect white-label configuration if role is admin
+    if (data.role === 'sadmin') {
+      // Add white-label configuration to the data
+      if (whiteLabelDomainRef.current && whiteLabelDomainRef.current.value.trim() !== '') {
+        data.whiteLabelDomain = whiteLabelDomainRef.current.value.trim();
+      }
+      if (whiteLabelCompanyNameRef.current && whiteLabelCompanyNameRef.current.value.trim() !== '') {
+        data.whiteLabelCompanyName = whiteLabelCompanyNameRef.current.value.trim();
+      }
+      if (whiteLabelLogoUrlRef.current && whiteLabelLogoUrlRef.current.value.trim() !== '') {
+        data.whiteLabelLogoUrl = whiteLabelLogoUrlRef.current.value.trim();
+      }
+      if (whiteLabelFaviconUrlRef.current && whiteLabelFaviconUrlRef.current.value.trim() !== '') {
+        data.whiteLabelFaviconUrl = whiteLabelFaviconUrlRef.current.value.trim();
+      }
+      if (whiteLabelPrimaryColorRef.current && whiteLabelPrimaryColorRef.current.value) {
+        data.whiteLabelPrimaryColor = whiteLabelPrimaryColorRef.current.value;
+      }
+      if (whiteLabelSecondaryColorRef.current && whiteLabelSecondaryColorRef.current.value) {
+        data.whiteLabelSecondaryColor = whiteLabelSecondaryColorRef.current.value;
+      }
+      if (whiteLabelBackgroundColorRef.current && whiteLabelBackgroundColorRef.current.value) {
+        data.whiteLabelBackgroundColor = whiteLabelBackgroundColorRef.current.value;
+      }
+      if (whiteLabelTextColorRef.current && whiteLabelTextColorRef.current.value) {
+        data.whiteLabelTextColor = whiteLabelTextColorRef.current.value;
+      }
+      
+      data.whiteLabelIsActive = whiteLabelIsActiveRef.current ? whiteLabelIsActiveRef.current.value === 'true' : true;
+    }
+    
     console.log("Final data to submit:", data);
 
     UserService.addUser(data)
@@ -247,7 +290,12 @@ const AddUser = () => {
   const roleOption = () => {
     const userRole = userData.role
     const allRoles = JSON.parse(JSON.stringify(RoleName))
-    delete allRoles.admin
+    
+    // 'sadmin' role (Super Admin) can create 'admin' users (Admins), so don't delete admin role for Super Admin
+    if (userRole !== 'sadmin') {
+      delete allRoles.admin
+    }
+    
     const options: Record<string, string> = allRoles
     if (userRole && userRole != 'admin') {
       const allOptions = Object.keys(options)
@@ -931,6 +979,147 @@ const AddUser = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* White-label Configuration Section - Only for Admin role */}
+                {watch('role') === 'sadmin' && (
+                  <div className="row m-t-20">
+                    <div className="col-md-12">
+                      <h4>White-Label Configuration</h4>
+                      <div className="row">
+                        <div className="col-md-6">
+                          <div className="form-group">
+                            <label htmlFor="whiteLabelDomain">Domain:</label>
+                            <input
+                              type="text"
+                              id="whiteLabelDomain"
+                              name="whiteLabelDomain"
+                              placeholder="e.g., mybrand.com"
+                              className="form-control"
+                              defaultValue=""
+                              ref={whiteLabelDomainRef}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="form-group">
+                            <label htmlFor="whiteLabelCompanyName">Company Name:</label>
+                            <input
+                              type="text"
+                              id="whiteLabelCompanyName"
+                              name="whiteLabelCompanyName"
+                              placeholder="e.g., My Brand"
+                              className="form-control"
+                              defaultValue=""
+                              ref={whiteLabelCompanyNameRef}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-md-6">
+                          <div className="form-group">
+                            <label htmlFor="whiteLabelLogoUrl">Logo URL:</label>
+                            <input
+                              type="text"
+                              id="whiteLabelLogoUrl"
+                              name="whiteLabelLogoUrl"
+                              placeholder="https://example.com/logo.png"
+                              className="form-control"
+                              defaultValue=""
+                              ref={whiteLabelLogoUrlRef}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="form-group">
+                            <label htmlFor="whiteLabelFaviconUrl">Favicon URL:</label>
+                            <input
+                              type="text"
+                              id="whiteLabelFaviconUrl"
+                              name="whiteLabelFaviconUrl"
+                              placeholder="https://example.com/favicon.ico"
+                              className="form-control"
+                              defaultValue=""
+                              ref={whiteLabelFaviconUrlRef}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-md-3">
+                          <div className="form-group">
+                            <label htmlFor="whiteLabelPrimaryColor">Primary Color:</label>
+                            <input
+                              type="color"
+                              id="whiteLabelPrimaryColor"
+                              name="whiteLabelPrimaryColor"
+                              className="form-control"
+                              defaultValue="#007bff"
+                              ref={whiteLabelPrimaryColorRef}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-3">
+                          <div className="form-group">
+                            <label htmlFor="whiteLabelSecondaryColor">Secondary Color:</label>
+                            <input
+                              type="color"
+                              id="whiteLabelSecondaryColor"
+                              name="whiteLabelSecondaryColor"
+                              className="form-control"
+                              defaultValue="#6c757d"
+                              ref={whiteLabelSecondaryColorRef}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-3">
+                          <div className="form-group">
+                            <label htmlFor="whiteLabelBackgroundColor">Background Color:</label>
+                            <input
+                              type="color"
+                              id="whiteLabelBackgroundColor"
+                              name="whiteLabelBackgroundColor"
+                              className="form-control"
+                              defaultValue="#ffffff"
+                              ref={whiteLabelBackgroundColorRef}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-md-3">
+                          <div className="form-group">
+                            <label htmlFor="whiteLabelTextColor">Text Color:</label>
+                            <input
+                              type="color"
+                              id="whiteLabelTextColor"
+                              name="whiteLabelTextColor"
+                              className="form-control"
+                              defaultValue="#212529"
+                              ref={whiteLabelTextColorRef}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="row">
+                        <div className="col-md-6">
+                          <div className="form-group">
+                            <label htmlFor="whiteLabelIsActive">Is Active:</label>
+                            <select
+                              id="whiteLabelIsActive"
+                              name="whiteLabelIsActive"
+                              className="form-control"
+                              defaultValue="true"
+                              ref={whiteLabelIsActiveRef}
+                            >
+                              <option value="true">Active</option>
+                              <option value="false">Inactive</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className='row m-t-20'>
                   <div className='col-md-12'>
                     <div className='float-right'>

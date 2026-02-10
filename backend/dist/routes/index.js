@@ -1,14 +1,38 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.routes = void 0;
 const express_1 = __importDefault(require("express"));
+const path = __importStar(require("node:path"));
 const todo_1 = require("./todo");
 const user_1 = require("./user");
+const fs = __importStar(require("fs"));
 const sports_1 = require("./sports");
-const node_path_1 = __importDefault(require("node:path"));
 const userStake_1 = require("./userStake");
 const bet_1 = require("./bet");
 const match_1 = require("./match");
@@ -28,6 +52,7 @@ const BetController_1 = require("../controllers/BetController");
 const SportsController_1 = __importDefault(require("../controllers/SportsController"));
 const deposit_withdraw_1 = require("./deposit-withdraw");
 const intcasino_1 = require("./intcasino");
+const white_label_1 = require("./white-label");
 const router = express_1.default.Router();
 exports.routes = router;
 router.get('/api/t10', function (req, res) {
@@ -66,10 +91,67 @@ router.use('/api', Passport_1.default.authenticateJWT, Http_1.default.maintenanc
 router.use('/api', Passport_1.default.authenticateJWT, Http_1.default.maintenance, new sport_settings_1.SportSettingsRoutes().router);
 router.use('/api', Passport_1.default.authenticateJWT, Http_1.default.maintenance, new book_1.UserBookRoutes().router);
 router.use('/api', Passport_1.default.authenticateJWT, Http_1.default.maintenance, new deposit_withdraw_1.DepositWithdrawRoutes().router);
+// White-label routes
+router.use('/api', Passport_1.default.authenticateJWT, Http_1.default.maintenance, new white_label_1.WhiteLabelRoutes().router);
+// Public white-label routes (no auth required)
+router.use('/api', new white_label_1.WhiteLabelRoutes().router);
 // router.get("/", (req: Request, res: Response) => {
 //   return res.json({ helloWorld: "Hello World" });
 // });
 router.get('/*', (req, res) => {
-    return res.sendFile(node_path_1.default.join(__dirname, '../../public', 'index.html'));
+    // If there's white-label information in the request, send a customized index.html
+    if (req.whiteLabel) {
+        // Read the original index.html file
+        fs.readFile(path.join(__dirname, '../../public', 'index.html'), 'utf8', (err, data) => {
+            if (err) {
+                console.error('Error reading index.html:', err);
+                return res.sendFile(path.join(__dirname, '../../public', 'index.html'));
+            }
+            // Customize the HTML with white-label settings
+            let customizedHtml = data;
+            // Update title
+            if (req.whiteLabel.companyName) {
+                customizedHtml = customizedHtml.replace(/<title>[^<]*<\/title>/, `<title>${req.whiteLabel.companyName}</title>`);
+            }
+            // Update favicon if available
+            if (req.whiteLabel.faviconUrl) {
+                customizedHtml = customizedHtml.replace(/<link rel="icon"[^>]*>/g, `<link rel="icon" type="image/x-icon" href="${req.whiteLabel.faviconUrl}">`);
+            }
+            // Add CSS variables for theme colors
+            const themeStyles = `
+      <style id="white-label-theme">
+        :root {
+          --primary-color: ${req.whiteLabel.primaryColor || '#007bff'};
+          --secondary-color: ${req.whiteLabel.secondaryColor || '#6c757d'};
+          --background-color: ${req.whiteLabel.backgroundColor || '#ffffff'};
+          --text-color: ${req.whiteLabel.textColor || '#212529'};
+          --font-family: '${req.whiteLabel.fontFamily || 'Arial, sans-serif'}';
+        }
+        
+        body {
+          background-color: var(--background-color) !important;
+          color: var(--text-color) !important;
+          font-family: var(--font-family) !important;
+        }
+        
+        .btn-primary, button.btn-primary {
+          background-color: var(--primary-color) !important;
+          border-color: var(--primary-color) !important;
+        }
+        
+        .btn-secondary {
+          background-color: var(--secondary-color) !important;
+          border-color: var(--secondary-color) !important;
+        }
+      </style>`;
+            // Insert the theme styles after the opening head tag
+            customizedHtml = customizedHtml.replace(/<head>/, `<head>${themeStyles}`);
+            res.send(customizedHtml);
+        });
+    }
+    else {
+        // Serve default index.html
+        return res.sendFile(path.join(__dirname, '../../public', 'index.html'));
+    }
 });
 //# sourceMappingURL=index.js.map

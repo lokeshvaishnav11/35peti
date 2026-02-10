@@ -873,7 +873,7 @@ input + .slider span:last-child {
 }
 
 .navbar-light .navbar-nav .nav-link {
-  color: rgb(64, 64, 64);
+  color: #ffffff !important;
 }
 
 .custom-tabs {
@@ -883,7 +883,7 @@ input + .slider span:last-child {
 .custom-tabs .nav-link {
   border: none;
   background: transparent;
-  color: #0d6efd; /* blue text */
+  color: #ffffff !important; /* white text */
   font-weight: 500;
   margin-right: 10px;
 }
@@ -913,8 +913,8 @@ input + .slider span:last-child {
 .navbar > .show > a,
 .navbar > .show > a:focus,
 .navbar > .show > a:hover {
-  color: var(--primary-color);
-  background: transparent;
+  color: #ffffff !important;
+  background: #007bff !important; /* blue background */
   outline: 0;
 }
 
@@ -933,12 +933,40 @@ input + .slider span:last-child {
 /*first level*/
 .btco-hover-menu .collapse ul > li:hover > a {
   background: var(--theme2-bg);
-  color: var(--secondary-color);
+  color: #ffffff;
+}
+
+/* Make dropdown items white by default */
+.dropdown-item {
+  color: #ffffff !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  color: #ffffff !important;
+  background-color: #007bff !important; /* blue background */
 }
 
 /*second level*/
 .btco-hover-menu .collapse ul ul ul > li:hover > a {
   background: #fff;
+  color: #000000;
+}
+
+/* User menu items */
+.username ul li a {
+  color: #ffffff !important;
+}
+
+/* Make bold text white in header */
+b, strong {
+  font-weight: bolder;
+  color: white !important;
+}
+
+.username ul li a:hover {
+  color: #ffffff !important;
+  background-color: #007bff !important; /* blue background */
 }
 
 /*third level*/
@@ -6378,7 +6406,7 @@ img.rrotate {
   padding: 10px;
   clear: both;
   font-weight: 400;
-  color: #212529;
+  color: #ffffff !important;
   text-align: inherit;
   white-space: nowrap;
   background-color: transparent;

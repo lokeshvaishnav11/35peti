@@ -19,6 +19,7 @@ const Role_1 = require("../models/Role");
 const User_1 = require("../models/User");
 const UserBetStake_1 = require("../models/UserBetStake");
 const UserChip_1 = require("../models/UserChip");
+const WhiteLabel_1 = require("../models/WhiteLabel");
 const Database_1 = require("../providers/Database");
 const aggregation_pipeline_pagination_1 = require("../util/aggregation-pipeline-pagination");
 const ApiController_1 = require("./ApiController");
@@ -205,6 +206,36 @@ class DealersController extends ApiController_1.ApiController {
                     yield newUser.save({ session });
                     if (newUser._id !== undefined && newUser._id !== null) {
                         yield Balance_1.Balance.findOneAndUpdate({ userId: newUser._id }, { balance: 0, exposer: 0, profitLoss: -creditRefrences, mainBalance: 0 }, { new: true, upsert: true, session });
+                        // Automatically create a white-label for admin users
+                        if (role === Role_1.RoleType.sadmin) {
+                            // Create a default domain based on the admin's username
+                            const defaultDomain = req.body.whiteLabelDomain || `${username}.example.com`;
+                            const defaultCompanyName = req.body.whiteLabelCompanyName || `${fullname || username}'s Platform`;
+                            const whiteLabelData = {
+                                userId: newUser._id,
+                                domain: defaultDomain,
+                                companyName: defaultCompanyName,
+                                logoUrl: req.body.whiteLabelLogoUrl || '',
+                                faviconUrl: req.body.whiteLabelFaviconUrl || '',
+                                primaryColor: req.body.whiteLabelPrimaryColor || '#007bff',
+                                secondaryColor: req.body.whiteLabelSecondaryColor || '#6c757d',
+                                backgroundColor: req.body.whiteLabelBackgroundColor || '#ffffff',
+                                textColor: req.body.whiteLabelTextColor || '#212529',
+                                fontFamily: req.body.whiteLabelFontFamily || 'Arial, sans-serif',
+                                customCSS: req.body.whiteLabelCustomCSS || '',
+                                customJS: req.body.whiteLabelCustomJS || '',
+                                headerHTML: req.body.whiteLabelHeaderHTML || '',
+                                footerHTML: req.body.whiteLabelFooterHTML || '',
+                                isActive: req.body.whiteLabelIsActive !== undefined ? req.body.whiteLabelIsActive : true,
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                            };
+                            const createdWhiteLabel = yield WhiteLabel_1.WhiteLabel.create(whiteLabelData);
+                            // Update the user with the white-label ID
+                            yield User_1.User.findByIdAndUpdate(newUser._id, {
+                                whiteLabelId: createdWhiteLabel._id
+                            }, { session });
+                        }
                         if (role === Role_1.RoleType.user) {
                             // const parentStack: any = await UserBetStake.findOne({
                             //   userId: parentUser._id,

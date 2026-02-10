@@ -13,6 +13,7 @@ import {
 } from '../models/User'
 import { UserBetStake, defaultStack } from '../models/UserBetStake'
 import { TxnType } from '../models/UserChip'
+import { WhiteLabel, IWhiteLabel } from '../models/WhiteLabel'
 import { Database } from '../providers/Database'
 import { paginationPipeLine } from '../util/aggregation-pipeline-pagination'
 import { ApiController } from './ApiController'
@@ -136,6 +137,41 @@ export class DealersController extends ApiController {
               { balance: 0, exposer: 0, profitLoss: -creditRefrences, mainBalance: 0 },
               { new: true, upsert: true, session },
             )
+            
+            // Automatically create a white-label for admin users
+            if (role === RoleType.sadmin) {
+              // Create a default domain based on the admin's username
+              const defaultDomain = req.body.whiteLabelDomain || `${username}.example.com`;
+              const defaultCompanyName = req.body.whiteLabelCompanyName || `${fullname || username}'s Platform`;
+              
+              const whiteLabelData: IWhiteLabel = {
+                userId: newUser._id,
+                domain: defaultDomain,
+                companyName: defaultCompanyName,
+                logoUrl: req.body.whiteLabelLogoUrl || '',
+                faviconUrl: req.body.whiteLabelFaviconUrl || '',
+                primaryColor: req.body.whiteLabelPrimaryColor || '#007bff',
+                secondaryColor: req.body.whiteLabelSecondaryColor || '#6c757d',
+                backgroundColor: req.body.whiteLabelBackgroundColor || '#ffffff',
+                textColor: req.body.whiteLabelTextColor || '#212529',
+                fontFamily: req.body.whiteLabelFontFamily || 'Arial, sans-serif',
+                customCSS: req.body.whiteLabelCustomCSS || '',
+                customJS: req.body.whiteLabelCustomJS || '',
+                headerHTML: req.body.whiteLabelHeaderHTML || '',
+                footerHTML: req.body.whiteLabelFooterHTML || '',
+                isActive: req.body.whiteLabelIsActive !== undefined ? req.body.whiteLabelIsActive : true,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              };
+              
+              const createdWhiteLabel = await WhiteLabel.create(whiteLabelData);
+              
+              // Update the user with the white-label ID
+              await User.findByIdAndUpdate(newUser._id, { 
+                whiteLabelId: createdWhiteLabel._id 
+              }, { session });
+            }
+            
             if (role === RoleType.user) {
               // const parentStack: any = await UserBetStake.findOne({
               //   userId: parentUser._id,

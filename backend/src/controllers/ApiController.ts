@@ -8,4 +8,8 @@ export abstract class ApiController {
   public fail(res: Response, err: Error | string) {
     return res.status(401).json(error(err.toString()))
   }
+  
+  public unauthorized(res: Response, message: string = 'Unauthorized') {
+    return res.status(403).json(error(message))
+  }
 }

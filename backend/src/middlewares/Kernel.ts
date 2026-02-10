@@ -4,6 +4,7 @@ import CORS from './CORS'
 import Http from './Http'
 import Statics from './Statics'
 import StatusMonitor from './StatusMonitor'
+import { whiteLabelMiddleware } from './WhiteLabelMiddleware'
 
 import Locals from '../providers/Locals'
 
@@ -23,6 +24,9 @@ class Kernel {
 
     // Mount status monitor middleware
     _express = StatusMonitor.mount(_express)
+    
+    // Mount white-label middleware
+    _express.use(whiteLabelMiddleware)
 
     //Post middleware
     _express.use(Http.postMiddleware)

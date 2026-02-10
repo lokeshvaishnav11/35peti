@@ -9,6 +9,9 @@ class ApiController {
     fail(res, err) {
         return res.status(401).json((0, ResponseApi_1.error)(err.toString()));
     }
+    unauthorized(res, message = 'Unauthorized') {
+        return res.status(403).json((0, ResponseApi_1.error)(message));
+    }
 }
 exports.ApiController = ApiController;
 //# sourceMappingURL=ApiController.js.map

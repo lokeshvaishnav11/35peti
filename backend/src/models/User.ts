@@ -49,6 +49,7 @@ export interface IUser {
   AllowCasino?: string[]
   ctv:boolean
   stv:boolean
+  whiteLabelId?: mongoose.Types.ObjectId
 }
 
 export interface IUserModel extends IUser, Document {
@@ -86,7 +87,8 @@ export const userSchema: Schema = new Schema(
     Allowsport: [],
     AllowCasino: [],
     ctv:{type:Boolean,default:true},
-    stv:{type:Boolean,default:true}
+    stv:{type:Boolean,default:true},
+    whiteLabelId: { type: Types.ObjectId, ref: 'WhiteLabel' }
 
     
   },

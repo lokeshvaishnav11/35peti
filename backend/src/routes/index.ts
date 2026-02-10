@@ -1,8 +1,9 @@
 import express, { Request, Response } from 'express'
+import * as path from 'node:path'
 import { TodoRoutes } from './todo'
 import { UserRoutes } from './user'
+import * as fs from 'fs'
 import { SportRoutes } from './sports'
-import path from 'node:path'
 import { UserStakeRoutes } from './userStake'
 import { BetRoute } from './bet'
 import { MatchRoutes } from './match'
@@ -22,6 +23,7 @@ import { BetController } from '../controllers/BetController'
 import SportsController from '../controllers/SportsController'
 import { DepositWithdrawRoutes } from './deposit-withdraw'
 import { CallbackRoutes } from './intcasino'
+import { WhiteLabelRoutes } from './white-label'
 
 const router = express.Router()
 
@@ -72,12 +74,85 @@ router.use('/api', Passport.authenticateJWT, Http.maintenance, new SportSettings
 router.use('/api', Passport.authenticateJWT, Http.maintenance, new UserBookRoutes().router)
 router.use('/api', Passport.authenticateJWT, Http.maintenance, new DepositWithdrawRoutes().router)
 
+// White-label routes
+router.use('/api', Passport.authenticateJWT, Http.maintenance, new WhiteLabelRoutes().router)
+
+// Public white-label routes (no auth required)
+router.use('/api', new WhiteLabelRoutes().router)
+
 // router.get("/", (req: Request, res: Response) => {
 //   return res.json({ helloWorld: "Hello World" });
 // });
 
 router.get('/*', (req: Request, res: Response) => {
-  return res.sendFile(path.join(__dirname, '../../public', 'index.html'))
+  // If there's white-label information in the request, send a customized index.html
+  if (req.whiteLabel) {
+    // Read the original index.html file
+    fs.readFile(path.join(__dirname, '../../public', 'index.html'), 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading index.html:', err);
+        return res.sendFile(path.join(__dirname, '../../public', 'index.html'));
+      }
+      
+      // Customize the HTML with white-label settings
+      let customizedHtml = data;
+      
+      // Update title
+      if (req.whiteLabel.companyName) {
+        customizedHtml = customizedHtml.replace(
+          /<title>[^<]*<\/title>/,
+          `<title>${req.whiteLabel.companyName}</title>`
+        );
+      }
+      
+      // Update favicon if available
+      if (req.whiteLabel.faviconUrl) {
+        customizedHtml = customizedHtml.replace(
+          /<link rel="icon"[^>]*>/g,
+          `<link rel="icon" type="image/x-icon" href="${req.whiteLabel.faviconUrl}">`
+        );
+      }
+      
+      // Add CSS variables for theme colors
+      const themeStyles = `
+      <style id="white-label-theme">
+        :root {
+          --primary-color: ${req.whiteLabel.primaryColor || '#007bff'};
+          --secondary-color: ${req.whiteLabel.secondaryColor || '#6c757d'};
+          --background-color: ${req.whiteLabel.backgroundColor || '#ffffff'};
+          --text-color: ${req.whiteLabel.textColor || '#212529'};
+          --font-family: '${req.whiteLabel.fontFamily || 'Arial, sans-serif'}';
+        }
+        
+        body {
+          background-color: var(--background-color) !important;
+          color: var(--text-color) !important;
+          font-family: var(--font-family) !important;
+        }
+        
+        .btn-primary, button.btn-primary {
+          background-color: var(--primary-color) !important;
+          border-color: var(--primary-color) !important;
+        }
+        
+        .btn-secondary {
+          background-color: var(--secondary-color) !important;
+          border-color: var(--secondary-color) !important;
+        }
+      </style>`;
+      
+      // Insert the theme styles after the opening head tag
+      customizedHtml = customizedHtml.replace(
+        /<head>/,
+        `<head>${themeStyles}`
+      );
+      
+      res.send(customizedHtml);
+    });
+  } else {
+    // Serve default index.html
+    return res.sendFile(path.join(__dirname, '../../public', 'index.html'));
+  }
 })
 
 export { router as routes }

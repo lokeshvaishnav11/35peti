@@ -7,6 +7,7 @@ import App from './App'
 import reportWebVitals from './reportWebVitals'
 import { WebSocketUserProvider } from './context/webSocketUser'
 import { WebSocketCasinoProvider } from './context/webSocketCasino'
+import { WhiteLabelProvider } from './context/WhiteLabelContext'
 import { createRoot } from 'react-dom/client';
 
 const rootElement = document.getElementById('root');
@@ -22,13 +23,15 @@ if (rootElement) {
       }
     >
       <Provider store={store}>
-        <WebSocketProvider>
-          <WebSocketUserProvider>
-            <WebSocketCasinoProvider>
-              <App />
-            </WebSocketCasinoProvider>
-          </WebSocketUserProvider>
-        </WebSocketProvider>
+        <WhiteLabelProvider>
+          <WebSocketProvider>
+            <WebSocketUserProvider>
+              <WebSocketCasinoProvider>
+                <App />
+              </WebSocketCasinoProvider>
+            </WebSocketUserProvider>
+          </WebSocketProvider>
+        </WhiteLabelProvider>
       </Provider>
     </Suspense>
   )

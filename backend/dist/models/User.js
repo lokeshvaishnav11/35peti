@@ -53,7 +53,8 @@ exports.userSchema = new mongoose_1.Schema({
     Allowsport: [],
     AllowCasino: [],
     ctv: { type: Boolean, default: true },
-    stv: { type: Boolean, default: true }
+    stv: { type: Boolean, default: true },
+    whiteLabelId: { type: mongoose_1.Types.ObjectId, ref: 'WhiteLabel' }
 }, {
     timestamps: true,
 });

@@ -12,6 +12,7 @@ import { getSportListAction } from './redux/actions/sports/sport.action'
 import { useAppDispatch, useAppSelector } from './redux/hooks'
 import Routers from './routes'
 import WindowFocusHandler from './utils/check-browser-active'
+import { loadWhiteLabelSettings } from './utils/white-label.util'
 import 'react-toastify/dist/ReactToastify.css'
 
 const App = () => {
@@ -57,6 +58,9 @@ const App = () => {
   // }, [loadingState])
 
   React.useEffect(() => {
+    // Load white-label settings when app starts
+    loadWhiteLabelSettings();
+    
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         // tab is changed
@@ -75,8 +79,12 @@ const App = () => {
       <ScrollToTop />
       <WindowFocusHandler />
       <LogoutInactive />
+      {/* White-label header container */}
+      <div id="white-label-header"></div>
       {/* <LoadingBar color='#f11946' ref={ref} shadow={true} /> */}
       <Routers />
+      {/* White-label footer container */}
+      <div id="white-label-footer"></div>
     </Router>
   )
 }
