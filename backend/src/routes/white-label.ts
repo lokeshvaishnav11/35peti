@@ -36,11 +36,12 @@ export class WhiteLabelRoutes {
     )
 
     // Admin routes (for current user's white-label)
-    // this.router.get(
-    //   '/my-white-label',
-      
-    //   this.whiteLabelController.getCurrentUserWhiteLabel
-    // )
+    this.router.get(
+      '/my-white-label',
+      Passport.authenticateJWT,
+      Http.maintenance,
+      this.whiteLabelController.getCurrentUserWhiteLabel
+    )
 
     this.router.put(
       '/update-white-label',
@@ -50,10 +51,10 @@ export class WhiteLabelRoutes {
     )
 
     // Public route to get white-label settings by domain
-    this.router.get(
-      '/domain/:domain',
-      this.whiteLabelController.getWhiteLabelByDomain
-    )
+    // this.router.get(
+    //   '/domain/:domain',
+    //   this.whiteLabelController.getWhiteLabelByDomain
+    // )
 
     // Get white-label by user ID
     this.router.get(

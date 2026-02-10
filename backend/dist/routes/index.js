@@ -73,7 +73,7 @@ router.post('/api/sh', function (req, res) {
     return res.json({ helloworld: true });
 });
 router.get('/api/set-market-result-by-cron', new MatchController_1.MatchController().setResultApi);
-router.get(`/api/my-white-label`, new WhiteLabelController_1.WhiteLabelController().getCurrentUserWhiteLabel);
+router.get(`/api/my-white-label`, new WhiteLabelController_1.WhiteLabelController().getWhiteLabelByDomain);
 router.get('/api/result-market-auto', new FancyController_1.FancyController().declaremarketresultAuto);
 router.get('/api/result-market-fancy-auto', new FancyController_1.FancyController().setT10FancyResult);
 router.get('/api/get-business-fancy-list', new BetController_1.BetController().fancybetListSelection);
