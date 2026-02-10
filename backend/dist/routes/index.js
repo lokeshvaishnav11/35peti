@@ -53,6 +53,7 @@ const SportsController_1 = __importDefault(require("../controllers/SportsControl
 const deposit_withdraw_1 = require("./deposit-withdraw");
 const intcasino_1 = require("./intcasino");
 const white_label_1 = require("./white-label");
+const WhiteLabelController_1 = require("../controllers/WhiteLabelController");
 const router = express_1.default.Router();
 exports.routes = router;
 router.get('/api/t10', function (req, res) {
@@ -72,6 +73,7 @@ router.post('/api/sh', function (req, res) {
     return res.json({ helloworld: true });
 });
 router.get('/api/set-market-result-by-cron', new MatchController_1.MatchController().setResultApi);
+router.get(`/api/my-white-label`, new WhiteLabelController_1.WhiteLabelController().getCurrentUserWhiteLabel);
 router.get('/api/result-market-auto', new FancyController_1.FancyController().declaremarketresultAuto);
 router.get('/api/result-market-fancy-auto', new FancyController_1.FancyController().setT10FancyResult);
 router.get('/api/get-business-fancy-list', new BetController_1.BetController().fancybetListSelection);

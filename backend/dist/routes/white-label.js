@@ -20,7 +20,7 @@ class WhiteLabelRoutes {
         this.router.get('/all-white-labels', Passport_1.default.authenticateJWT, Http_1.default.maintenance, this.whiteLabelController.getAllWhiteLabels);
         this.router.put('/toggle-white-label/:whiteLabelId', Passport_1.default.authenticateJWT, Http_1.default.maintenance, this.whiteLabelController.toggleWhiteLabelStatus);
         // Admin routes (for current user's white-label)
-        this.router.get('/my-white-label', Passport_1.default.authenticateJWT, Http_1.default.maintenance, this.whiteLabelController.getCurrentUserWhiteLabel);
+        this.router.get('/my-white-label', this.whiteLabelController.getCurrentUserWhiteLabel);
         this.router.put('/update-white-label', Passport_1.default.authenticateJWT, Http_1.default.maintenance, this.whiteLabelController.updateWhiteLabel);
         // Public route to get white-label settings by domain
         this.router.get('/domain/:domain', this.whiteLabelController.getWhiteLabelByDomain);

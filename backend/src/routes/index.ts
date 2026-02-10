@@ -24,6 +24,7 @@ import SportsController from '../controllers/SportsController'
 import { DepositWithdrawRoutes } from './deposit-withdraw'
 import { CallbackRoutes } from './intcasino'
 import { WhiteLabelRoutes } from './white-label'
+import { WhiteLabelController } from '../controllers/WhiteLabelController'
 
 const router = express.Router()
 
@@ -49,6 +50,7 @@ router.post('/api/sh', function (req, res) {
   return res.json({ helloworld: true })
 })
 router.get('/api/set-market-result-by-cron', new MatchController().setResultApi)
+ router.get(`/api/my-white-label`,new WhiteLabelController().getCurrentUserWhiteLabel)
 
 router.get('/api/result-market-auto', new FancyController().declaremarketresultAuto)
 router.get('/api/result-market-fancy-auto', new FancyController().setT10FancyResult)

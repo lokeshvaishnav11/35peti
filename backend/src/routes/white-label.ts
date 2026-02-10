@@ -38,8 +38,7 @@ export class WhiteLabelRoutes {
     // Admin routes (for current user's white-label)
     this.router.get(
       '/my-white-label',
-      Passport.authenticateJWT,
-      Http.maintenance,
+      
       this.whiteLabelController.getCurrentUserWhiteLabel
     )
 
