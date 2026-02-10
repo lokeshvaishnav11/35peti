@@ -36,11 +36,11 @@ export class WhiteLabelRoutes {
     )
 
     // Admin routes (for current user's white-label)
-    this.router.get(
-      '/my-white-label',
+    // this.router.get(
+    //   '/my-white-label',
       
-      this.whiteLabelController.getCurrentUserWhiteLabel
-    )
+    //   this.whiteLabelController.getCurrentUserWhiteLabel
+    // )
 
     this.router.put(
       '/update-white-label',
