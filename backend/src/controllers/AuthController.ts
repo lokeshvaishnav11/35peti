@@ -264,7 +264,7 @@ export class AuthController extends ApiController {
         doneBy: `${username}`,
         // description: `OLD status: Login=${user.isLogin}, Bet=${user.betLock}, Bet2=${user.betLock2} | NEW status: Login=${isUserActive}, Bet=${isUserBetActive}, Bet2=${isUserBet2Active}`,
 
-        description: `OLD password ${user2?.password}, NEW password ${new_password}`,
+        description: `password change by ${username} !`,
       });
 
       return this.success(res, { sucess: true }, 'Password updated succesfully')

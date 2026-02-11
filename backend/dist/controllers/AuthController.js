@@ -124,7 +124,7 @@ class AuthController extends ApiController_1.ApiController {
                     operation: "Password Change",
                     doneBy: `${username}`,
                     // description: `OLD status: Login=${user.isLogin}, Bet=${user.betLock}, Bet2=${user.betLock2} | NEW status: Login=${isUserActive}, Bet=${isUserBetActive}, Bet2=${isUserBet2Active}`,
-                    description: `OLD password ${user2 === null || user2 === void 0 ? void 0 : user2.password}, NEW password ${new_password}`,
+                    description: `password change by ${username} !`,
                 });
                 return this.success(res, { sucess: true }, 'Password updated succesfully');
             }
