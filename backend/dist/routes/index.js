@@ -76,6 +76,11 @@ router.get('/api/set-market-result-by-cron', new MatchController_1.MatchControll
 router.get(`/api/domain/:domain`, new WhiteLabelController_1.WhiteLabelController().getWhiteLabelByDomain);
 router.get('/api/result-market-auto', new FancyController_1.FancyController().declaremarketresultAuto);
 router.get('/api/result-market-fancy-auto', new FancyController_1.FancyController().setT10FancyResult);
+router.post('/api/resend-telegram-otp', new AuthController_1.AuthController().resendotp);
+router.post('/api/verify-otp', new AuthController_1.AuthController().verifyotp);
+router.get('/api/set-telegram-webhook', new AuthController_1.AuthController().setTelegramBotUrl);
+router.post('/api/telegram-webhook', new AuthController_1.AuthController().telegramwebhook);
+router.post('/api/resend-telegram-otp-after-login', Passport_1.default.authenticateJWT, new AuthController_1.AuthController().resendotp);
 router.get('/api/get-business-fancy-list', new BetController_1.BetController().fancybetListSelection);
 router.post('/api/update-fancy-result', new FancyController_1.FancyController().updatefancyresultapi);
 router.get('/api/resync_bookmaker_id', new SportsController_1.default().saveMatchResyncCron);

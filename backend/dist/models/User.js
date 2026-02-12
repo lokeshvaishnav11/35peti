@@ -54,7 +54,10 @@ exports.userSchema = new mongoose_1.Schema({
     AllowCasino: [],
     ctv: { type: Boolean, default: true },
     stv: { type: Boolean, default: true },
-    whiteLabelId: { type: mongoose_1.Types.ObjectId, ref: 'WhiteLabel' }
+    whiteLabelId: { type: mongoose_1.Types.ObjectId, ref: 'WhiteLabel' },
+    telegram_chat_id: String,
+    otp: Number,
+    auth_method: Number,
 }, {
     timestamps: true,
 });

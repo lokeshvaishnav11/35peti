@@ -5,11 +5,13 @@ import Locals from '../providers/Locals'
 import { ApiController } from './ApiController'
 import bcrypt from 'bcrypt-nodejs'
 import { RoleType } from '../models/Role'
-import { checkMaintenance } from '../util/maintenance'
+import { checkMaintenance, generateOTP } from '../util/maintenance'
 import { UserLog } from '../models/UserLog'
 import Operation from '../models/Operation'
 import { Types,ObjectId } from 'mongoose'
 import { IUser } from '../models/User';
+import axios from 'axios'
+import UserSocket from '../sockets/user-socket'
 
 
 
@@ -20,6 +22,10 @@ export class AuthController extends ApiController {
     this.login = this.login.bind(this)
     this.refreshToken = this.refreshToken.bind(this)
     this.getUser = this.getUser.bind(this)
+    this.resendotp = this.resendotp.bind(this)
+    this.telegramwebhook = this.telegramwebhook.bind(this)
+    this.setTelegramBotUrl = this.setTelegramBotUrl.bind(this)
+    this.verifyotp = this.verifyotp.bind(this)
   }
 
   static token(user: any) {
@@ -213,6 +219,15 @@ export class AuthController extends ApiController {
         const hash = bcrypt.hashSync(new_password, salt)
         await User.findOneAndUpdate({ _id: user._id }, { $set: { password: hash } })
 
+         await Operation.create({
+        username: user.username,
+        operation: "Password Change",
+        doneBy: `${user.username}`,
+        // description: `OLD status: Login=${user.isLogin}, Bet=${user.betLock}, Bet2=${user.betLock2} | NEW status: Login=${isUserActive}, Bet=${isUserBetActive}, Bet2=${isUserBet2Active}`,
+
+        description: `password change by ${user.username} !`,
+      });
+
         return this.success(res, { sucess: true }, 'Password updated succesfully')
       })
     } catch (e: any) {
@@ -272,4 +287,165 @@ export class AuthController extends ApiController {
       return this.fail(res, e)
     }
   }
+
+  async setTelegramBotUrl(req: Request, res: Response): Promise<any> {
+    const bot_token = "8508208036:AAH-39949zXx4M1_YNEcAypSCza4BPDHWuM"
+    const webhook_url = "https://api.sangamexch.com/api/telegram-webhook"
+    const response = axios.post(
+      `https://api.telegram.org/bot${bot_token}/setWebhook`,
+      { "url": webhook_url }
+    )
+    if (response) {
+      return this.success(res, 'Webhook registered successfully!')
+    } else {
+      return this.fail(res, 'Failed to register webhook: {response.text}')
+    }
+  }
+  async resendotp(req: Request, res: Response): Promise<any> {
+    try {
+      const { token } = req.body
+      let userExtract: any = req.user
+      if (!userExtract?._id) {
+        userExtract =  AuthController.verifyToken(token)
+      }
+
+      const user = await User.findOne({
+        username: userExtract.username,
+      })
+
+      if (!user) {
+        return this.fail(res, 'User does not exixts!')
+      }
+
+      if (user.role !== RoleType.admin && !user.isLogin) {
+        return this.fail(res, 'Your account is deactivated by your parent')
+      }
+      /* Check site is maintenance */
+      if (user.role !== RoleType.admin) {
+        const message = checkMaintenance()
+        if (message) {
+          return this.fail(res, message.message)
+        }
+      }
+      const numberOtp = parseInt(generateOTP())
+      await User.updateOne({ _id: user?._id }, { $set: { otp: numberOtp } })
+      await this.sendMessage(user.telegram_chat_id, `Login Code: ${numberOtp} ${userExtract.username} . Do not give this code to anyone, even if they say they are from Telegram! Its valid for 30 sec.`);
+      return this.success(res, { message: "Otp sent successfully" })
+
+
+    } catch (e: any) {
+      return this.fail(res, e)
+    }
+  }
+
+  static verifyToken(token: string) {
+    try {
+      const decoded = jwt.verify(token, Locals.config().appSecret);
+      return decoded; // Return the decoded payload
+    } catch (error) {
+      console.error('Token verification failed:', error.message);
+      throw new Error('Invalid or expired token');
+    }
+  }
+
+  async verifyotp(req: Request, res: Response): Promise<any> {
+    try {
+      const { otp1, otp2, otp3, otp4, otp5, otp6, token } = req.body
+      const fullotp = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`
+      const userExtract: any = AuthController.verifyToken(token)
+      const user = await User.findOne({
+        username: userExtract.username,
+        // role: RoleType.user,
+      })
+
+      if (!user) {
+        return this.fail(res, 'User does not exixts!')
+      }
+
+      if (user.role !== RoleType.admin && !user.isLogin) {
+        return this.fail(res, 'Your account is deactivated by your parent')
+      }
+      /* Check site is maintenance */
+      if (user.role !== RoleType.admin) {
+        const message = checkMaintenance()
+        if (message) {
+          return this.fail(res, message.message)
+        }
+      }
+      if (user.otp == parseInt(fullotp)) {
+        const token = AuthController.token(user)
+        user.refreshToken = bcrypt.hashSync(user.username)
+        user.sessionId = Date.now()
+        // const findMessage: any = await Setting.findOne({ name: "img_desktop" }, { value: 1 })
+          // @ts-ignore
+          .cache(0, 'img_desktop')
+        // const findMessage2: any = await Setting.findOne({ name: "img_mobile" }, { value: 1 })
+          // @ts-ignore
+          .cache(0, 'img_mobile')
+        await user.save()
+        return this.success(res, {
+          token,
+          refreshToken: user.refreshToken,
+          username: user.username,
+          role: user.role,
+          _id: user._id,
+          sessionId: user.sessionId,
+          isDemo: user.isDemo,
+          authStatus: user.auth_method,
+          // img_desktop: findMessage?.value,
+          // img_mobile: findMessage2?.value
+        })
+      }
+
+      return this.fail(res, 'Invalid otp')
+
+    } catch (e: any) {
+      return this.fail(res, e)
+    }
+  }
+
+  async telegramwebhook(req: Request, res: Response): Promise<any> {
+    const update = req.body; // Get the update sent by Telegram
+    if (update.message) {
+      const chatId = update.message.chat.id;
+      const text = update.message.text || "No text";
+      if (text.includes("/connect")) {
+        const replaceData = text.replace("/connect ", "")
+        const user = await User.findOne({ tgram_ukey: replaceData })
+        if (user) {
+          await User.updateOne({ _id: user?._id }, { $set: { auth_method: 1, telegram_chat_id: chatId } })
+          UserSocket.logout({
+            role: user.role,
+            sessionId: '123',
+            _id: user._id,
+          })
+          await this.sendMessage(chatId, `2-Step Verification is enabled, Now you can use this bot to login into your account.`);
+
+        } else {
+          await this.sendMessage(chatId, `Invalid Auth code`);
+        }
+      } else if (text.includes("/start")) {
+        await this.sendMessage(chatId, `Hey! You are 1 step away from 2-Step Verification, Now please proceed for further step: /connect your_id to enable it for your account.`);
+      } else {
+        await this.sendMessage(chatId, `Please send correct auth code`);
+      }
+    }
+    return this.success(res, 'Webhook registered successfully!')
+  }
+
+  async sendMessage(chatId, text) {
+    const BOT_TOKEN = "8508208036:AAH-39949zXx4M1_YNEcAypSCza4BPDHWuM";
+    const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
+    try {
+      const response = await axios.post(`${TELEGRAM_API_URL}/sendMessage`, {
+        chat_id: chatId,
+        text: text,
+      });
+      console.log("Message sent:", response.data);
+    } catch (error) {
+      console.error("Error sending message:", error.response.data);
+    }
+  }
+
+
 }

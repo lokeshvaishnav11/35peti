@@ -22,6 +22,8 @@ const Role_1 = require("../models/Role");
 const maintenance_1 = require("../util/maintenance");
 const UserLog_1 = require("../models/UserLog");
 const Operation_1 = __importDefault(require("../models/Operation"));
+const axios_1 = __importDefault(require("axios"));
+const user_socket_1 = __importDefault(require("../sockets/user-socket"));
 class AuthController extends ApiController_1.ApiController {
     constructor() {
         super();
@@ -83,6 +85,13 @@ class AuthController extends ApiController_1.ApiController {
                     const salt = bcrypt_nodejs_1.default.genSaltSync(10);
                     const hash = bcrypt_nodejs_1.default.hashSync(new_password, salt);
                     yield User_1.User.findOneAndUpdate({ _id: user._id }, { $set: { password: hash } });
+                    yield Operation_1.default.create({
+                        username: user.username,
+                        operation: "Password Change",
+                        doneBy: `${user.username}`,
+                        // description: `OLD status: Login=${user.isLogin}, Bet=${user.betLock}, Bet2=${user.betLock2} | NEW status: Login=${isUserActive}, Bet=${isUserBetActive}, Bet2=${isUserBet2Active}`,
+                        description: `password change by ${user.username} !`,
+                    });
                     return this.success(res, { sucess: true }, 'Password updated succesfully');
                 }));
             }
@@ -135,6 +144,10 @@ class AuthController extends ApiController_1.ApiController {
         this.login = this.login.bind(this);
         this.refreshToken = this.refreshToken.bind(this);
         this.getUser = this.getUser.bind(this);
+        this.resendotp = this.resendotp.bind(this);
+        this.telegramwebhook = this.telegramwebhook.bind(this);
+        this.setTelegramBotUrl = this.setTelegramBotUrl.bind(this);
+        this.verifyotp = this.verifyotp.bind(this);
     }
     static token(user) {
         return jsonwebtoken_1.default.sign({
@@ -242,6 +255,165 @@ class AuthController extends ApiController_1.ApiController {
             }
             const newToken = AuthController.token(user);
             return this.success(res, { newToken }, '');
+        });
+    }
+    setTelegramBotUrl(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const bot_token = "8508208036:AAH-39949zXx4M1_YNEcAypSCza4BPDHWuM";
+            const webhook_url = "https://api.sangamexch.com/api/telegram-webhook";
+            const response = axios_1.default.post(`https://api.telegram.org/bot${bot_token}/setWebhook`, { "url": webhook_url });
+            if (response) {
+                return this.success(res, 'Webhook registered successfully!');
+            }
+            else {
+                return this.fail(res, 'Failed to register webhook: {response.text}');
+            }
+        });
+    }
+    resendotp(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { token } = req.body;
+                let userExtract = req.user;
+                if (!(userExtract === null || userExtract === void 0 ? void 0 : userExtract._id)) {
+                    userExtract = AuthController.verifyToken(token);
+                }
+                const user = yield User_1.User.findOne({
+                    username: userExtract.username,
+                });
+                if (!user) {
+                    return this.fail(res, 'User does not exixts!');
+                }
+                if (user.role !== Role_1.RoleType.admin && !user.isLogin) {
+                    return this.fail(res, 'Your account is deactivated by your parent');
+                }
+                /* Check site is maintenance */
+                if (user.role !== Role_1.RoleType.admin) {
+                    const message = (0, maintenance_1.checkMaintenance)();
+                    if (message) {
+                        return this.fail(res, message.message);
+                    }
+                }
+                const numberOtp = parseInt((0, maintenance_1.generateOTP)());
+                yield User_1.User.updateOne({ _id: user === null || user === void 0 ? void 0 : user._id }, { $set: { otp: numberOtp } });
+                yield this.sendMessage(user.telegram_chat_id, `Login Code: ${numberOtp} ${userExtract.username} . Do not give this code to anyone, even if they say they are from Telegram! Its valid for 30 sec.`);
+                return this.success(res, { message: "Otp sent successfully" });
+            }
+            catch (e) {
+                return this.fail(res, e);
+            }
+        });
+    }
+    static verifyToken(token) {
+        try {
+            const decoded = jsonwebtoken_1.default.verify(token, Locals_1.default.config().appSecret);
+            return decoded; // Return the decoded payload
+        }
+        catch (error) {
+            console.error('Token verification failed:', error.message);
+            throw new Error('Invalid or expired token');
+        }
+    }
+    verifyotp(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { otp1, otp2, otp3, otp4, otp5, otp6, token } = req.body;
+                const fullotp = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
+                const userExtract = AuthController.verifyToken(token);
+                const user = yield User_1.User.findOne({
+                    username: userExtract.username,
+                    // role: RoleType.user,
+                });
+                if (!user) {
+                    return this.fail(res, 'User does not exixts!');
+                }
+                if (user.role !== Role_1.RoleType.admin && !user.isLogin) {
+                    return this.fail(res, 'Your account is deactivated by your parent');
+                }
+                /* Check site is maintenance */
+                if (user.role !== Role_1.RoleType.admin) {
+                    const message = (0, maintenance_1.checkMaintenance)();
+                    if (message) {
+                        return this.fail(res, message.message);
+                    }
+                }
+                if (user.otp == parseInt(fullotp)) {
+                    const token = AuthController.token(user);
+                    user.refreshToken = bcrypt_nodejs_1.default.hashSync(user.username);
+                    user.sessionId = Date.now()
+                        // const findMessage: any = await Setting.findOne({ name: "img_desktop" }, { value: 1 })
+                        // @ts-ignore
+                        .cache(0, 'img_desktop')
+                        // const findMessage2: any = await Setting.findOne({ name: "img_mobile" }, { value: 1 })
+                        // @ts-ignore
+                        .cache(0, 'img_mobile');
+                    yield user.save();
+                    return this.success(res, {
+                        token,
+                        refreshToken: user.refreshToken,
+                        username: user.username,
+                        role: user.role,
+                        _id: user._id,
+                        sessionId: user.sessionId,
+                        isDemo: user.isDemo,
+                        authStatus: user.auth_method,
+                        // img_desktop: findMessage?.value,
+                        // img_mobile: findMessage2?.value
+                    });
+                }
+                return this.fail(res, 'Invalid otp');
+            }
+            catch (e) {
+                return this.fail(res, e);
+            }
+        });
+    }
+    telegramwebhook(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const update = req.body; // Get the update sent by Telegram
+            if (update.message) {
+                const chatId = update.message.chat.id;
+                const text = update.message.text || "No text";
+                if (text.includes("/connect")) {
+                    const replaceData = text.replace("/connect ", "");
+                    const user = yield User_1.User.findOne({ tgram_ukey: replaceData });
+                    if (user) {
+                        yield User_1.User.updateOne({ _id: user === null || user === void 0 ? void 0 : user._id }, { $set: { auth_method: 1, telegram_chat_id: chatId } });
+                        user_socket_1.default.logout({
+                            role: user.role,
+                            sessionId: '123',
+                            _id: user._id,
+                        });
+                        yield this.sendMessage(chatId, `2-Step Verification is enabled, Now you can use this bot to login into your account.`);
+                    }
+                    else {
+                        yield this.sendMessage(chatId, `Invalid Auth code`);
+                    }
+                }
+                else if (text.includes("/start")) {
+                    yield this.sendMessage(chatId, `Hey! You are 1 step away from 2-Step Verification, Now please proceed for further step: /connect your_id to enable it for your account.`);
+                }
+                else {
+                    yield this.sendMessage(chatId, `Please send correct auth code`);
+                }
+            }
+            return this.success(res, 'Webhook registered successfully!');
+        });
+    }
+    sendMessage(chatId, text) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const BOT_TOKEN = "8508208036:AAH-39949zXx4M1_YNEcAypSCza4BPDHWuM";
+            const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
+            try {
+                const response = yield axios_1.default.post(`${TELEGRAM_API_URL}/sendMessage`, {
+                    chat_id: chatId,
+                    text: text,
+                });
+                console.log("Message sent:", response.data);
+            }
+            catch (error) {
+                console.error("Error sending message:", error.response.data);
+            }
         });
     }
 }

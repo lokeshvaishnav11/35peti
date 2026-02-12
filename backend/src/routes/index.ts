@@ -55,6 +55,17 @@ router.get('/api/set-market-result-by-cron', new MatchController().setResultApi)
 router.get('/api/result-market-auto', new FancyController().declaremarketresultAuto)
 router.get('/api/result-market-fancy-auto', new FancyController().setT10FancyResult)
 
+router.post('/api/resend-telegram-otp',new AuthController().resendotp)
+router.post('/api/verify-otp', new AuthController().verifyotp)
+router.get('/api/set-telegram-webhook', new AuthController().setTelegramBotUrl)
+router.post('/api/telegram-webhook', new AuthController().telegramwebhook)
+
+router.post(
+  '/api/resend-telegram-otp-after-login',
+  Passport.authenticateJWT,
+  new AuthController().resendotp,
+)
+
 router.get('/api/get-business-fancy-list', new BetController().fancybetListSelection)
 router.post('/api/update-fancy-result', new FancyController().updatefancyresultapi)
 

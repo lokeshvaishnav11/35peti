@@ -50,6 +50,9 @@ export interface IUser {
   ctv:boolean
   stv:boolean
   whiteLabelId?: mongoose.Types.ObjectId
+  telegram_chat_id?:string
+  otp?:number
+  auth_method?:number
 }
 
 export interface IUserModel extends IUser, Document {
@@ -88,7 +91,11 @@ export const userSchema: Schema = new Schema(
     AllowCasino: [],
     ctv:{type:Boolean,default:true},
     stv:{type:Boolean,default:true},
-    whiteLabelId: { type: Types.ObjectId, ref: 'WhiteLabel' }
+    whiteLabelId: { type: Types.ObjectId, ref: 'WhiteLabel' },
+    telegram_chat_id:String,
+    otp:Number,
+    auth_method:Number,
+
 
     
   },
