@@ -71,6 +71,8 @@ class AuthService {
     return this.getToken() ? true : false
   }
 
+
+
   getSettingsList() {
     return api.get('setting-list')
   }

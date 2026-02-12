@@ -53,6 +53,7 @@ export interface IUser {
   telegram_chat_id?:string
   otp?:number
   auth_method?:number
+  tgram_ukey?:string
 }
 
 export interface IUserModel extends IUser, Document {
@@ -95,7 +96,7 @@ export const userSchema: Schema = new Schema(
     telegram_chat_id:String,
     otp:Number,
     auth_method:Number,
-
+   tgram_ukey:String,
 
     
   },

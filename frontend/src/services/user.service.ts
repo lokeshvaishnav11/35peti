@@ -32,6 +32,11 @@ class UserService {
     return api.get(`/alluserbetList22`)
   }
 
+
+
+  Auth2Factor(data:any){
+    return api.post(`/auth-two`,data)
+  }
   
 
   addUser(data: any) {
@@ -96,6 +101,12 @@ class UserService {
 
   loginReports(data:any){
     return api.post('/login-report', data)
+  }
+   enableButton(data:any){
+    return api.post('/resend-telegram-otp-after-login', data)
+  }
+   VerifyOtp(data:any){
+    return api.post('/disable-telegram-otp', data)
   }
 }
 

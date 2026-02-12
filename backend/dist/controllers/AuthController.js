@@ -141,6 +141,38 @@ class AuthController extends ApiController_1.ApiController {
                 return this.fail(res, e);
             }
         });
+        this.Auth2Factor = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = req.user;
+                const { password } = req.body;
+                console.log(req.body, "Lokesh");
+                const userData = yield User_1.User.findOne({ _id: user._id });
+                // return await userData.comparePassword(password).then(async (isMatch: any) => {
+                // if (!isMatch) {
+                //   return this.fail(res, 'Current Password not matched')
+                // }
+                const generateRandom8DigitString = () => {
+                    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    let result = "";
+                    for (let i = 0; i < 8; i++) {
+                        const randomIndex = Math.floor(Math.random() * chars.length);
+                        result += chars[randomIndex];
+                    }
+                    return result;
+                };
+                const otp = generateRandom8DigitString();
+                yield User_1.User.updateOne({ _id: user._id }, {
+                    $set: {
+                        tgram_ukey: otp
+                    }
+                });
+                return this.success(res, { sucess: true }, otp);
+                // })
+            }
+            catch (e) {
+                return this.fail(res, e);
+            }
+        });
         this.login = this.login.bind(this);
         this.refreshToken = this.refreshToken.bind(this);
         this.getUser = this.getUser.bind(this);

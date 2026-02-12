@@ -112,6 +112,11 @@ export class UserRoutes {
       this.authController.updatePassword,
     )
 
+     this.router.post(
+      '/auth-two',
+      Passport.authenticateJWT,
+      this.authController.Auth2Factor,
+    )
     this.router.post(
       '/get-user-list-suggestion',
       Passport.authenticateJWT,
@@ -143,6 +148,12 @@ export class UserRoutes {
       Http.validateRequest,
       Passport.authenticateJWT,
       this.dealerController.loginReport,
+    )
+
+    this.router.post(
+      '/disable-telegram-otp',
+      Passport.authenticateJWT,
+      this.dealerController.disableTelegramOtp,
     )
   }
 }

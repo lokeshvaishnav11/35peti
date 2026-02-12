@@ -58,6 +58,7 @@ exports.userSchema = new mongoose_1.Schema({
     telegram_chat_id: String,
     otp: Number,
     auth_method: Number,
+    tgram_ukey: String,
 }, {
     timestamps: true,
 });

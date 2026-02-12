@@ -140,6 +140,7 @@ class DealersController extends ApiController_1.ApiController {
         this.updateUserStatus = this.updateUserStatus.bind(this);
         this.updateUserWallet = this.updateUserWallet.bind(this);
         this.updateUserWhatsapp = this.updateUserWhatsapp.bind(this);
+        this.disableTelegramOtp = this.disableTelegramOtp.bind(this);
     }
     signUp(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -772,6 +773,22 @@ class DealersController extends ApiController_1.ApiController {
             catch (e) {
                 console.error(e);
                 return res.status(500).json({ message: 'Failed to update WhatsApp', error: e.message });
+            }
+        });
+    }
+    disableTelegramOtp(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = req.user;
+            const payload = req.body;
+            console.log(payload, "lokesh");
+            const otp = req.body.otp; //`${payload.otp1}${payload.otp2}${payload.otp3}${payload.otp4}${payload.otp5}${payload.otp6}`
+            const userInfo = yield User_1.User.findOne({ username: user.username });
+            if (userInfo && (userInfo === null || userInfo === void 0 ? void 0 : userInfo.otp) == parseInt(otp)) {
+                yield User_1.User.updateOne({ _id: userInfo === null || userInfo === void 0 ? void 0 : userInfo._id }, { $set: { auth_method: 0 } });
+                return this.success(res, "Auth method disabled");
+            }
+            else {
+                return this.fail(res, "Otp Does Not Match");
             }
         });
     }

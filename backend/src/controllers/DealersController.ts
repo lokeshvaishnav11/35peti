@@ -36,6 +36,7 @@ export class DealersController extends ApiController {
     this.updateUserStatus = this.updateUserStatus.bind(this)
     this.updateUserWallet = this.updateUserWallet.bind(this)
     this.updateUserWhatsapp = this.updateUserWhatsapp.bind(this)
+    this.disableTelegramOtp = this.disableTelegramOtp.bind(this)
   }
 
   async signUp(req: Request, res: Response): Promise<Response> {
@@ -910,6 +911,22 @@ loginReport  = async (req: Request, res: Response) => {
     } catch (e: any) {
      
       return this.fail(res, "Server error: " + e.message);
+    }
+  }
+
+  async disableTelegramOtp(req: Request, res: Response): Promise<Response> {
+    const user: any = req.user
+    const payload = req.body
+    console.log(payload,"lokesh")
+    const otp =  req.body.otp //`${payload.otp1}${payload.otp2}${payload.otp3}${payload.otp4}${payload.otp5}${payload.otp6}`
+    const userInfo = await User.findOne({ username: user.username })
+    if (userInfo && userInfo?.otp == parseInt(otp)) {
+      await User.updateOne({ _id: userInfo?._id }, { $set: { auth_method: 0 } })
+      return this.success(res, "Auth method disabled")
+
+    } else {
+      return this.fail(res, "Otp Does Not Match")
+
     }
   }
 }

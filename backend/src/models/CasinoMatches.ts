@@ -24,7 +24,7 @@ const CasinoMatchSchema = new Schema<ICasinoMatch>(
     id: Number,
     event_data: Object,
     isDisable: Boolean,
-    order:Number
+    order:Number 
   },
   {
     timestamps: true,

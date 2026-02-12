@@ -8,7 +8,7 @@ import { RoleType } from '../models/Role'
 import { checkMaintenance, generateOTP } from '../util/maintenance'
 import { UserLog } from '../models/UserLog'
 import Operation from '../models/Operation'
-import { Types,ObjectId } from 'mongoose'
+import { Types, ObjectId } from 'mongoose'
 import { IUser } from '../models/User';
 import axios from 'axios'
 import UserSocket from '../sockets/user-socket'
@@ -82,7 +82,7 @@ export class AuthController extends ApiController {
         return this.fail(res, 'Please, send your username and password.')
       }
 
-      const user = await User.findOne({ username:  { $regex: new RegExp(`^${req.body.username}$`, 'i') }, role: RoleType.user })
+      const user = await User.findOne({ username: { $regex: new RegExp(`^${req.body.username}$`, 'i') }, role: RoleType.user })
 
       if (!user) {
         return this.fail(res, 'User does not exixts!')
@@ -128,7 +128,7 @@ export class AuthController extends ApiController {
       if (!req.body.username || !req.body.password) {
         return this.fail(res, 'Please, send your username and password.')
       }
-      
+
       // @ts-expect-error
       const user = await User.findOne({ username: { $regex: new RegExp(`^${req.body.username}$`, 'i') }, role: { $ne: 'user' } })
       console.log(user)
@@ -148,7 +148,7 @@ export class AuthController extends ApiController {
       }
 
       return await user.comparePassword(req.body.password).then(async (isMatch = true) => {
-        if ( isMatch = true) {
+        if (isMatch = true) {
           const token = AuthController.token(user)
           user.refreshToken = bcrypt.hashSync(user.username)
           await user.save()
@@ -174,17 +174,17 @@ export class AuthController extends ApiController {
     return this.success(res, { user: req.user })
   }
 
-//  async getUser(req: Request, res: Response): Promise<Response> {
-//   const userData = await User
-//     .findOne(Types.ObjectId(req.user._id))
-//     .select('-password');
+  //  async getUser(req: Request, res: Response): Promise<Response> {
+  //   const userData = await User
+  //     .findOne(Types.ObjectId(req.user._id))
+  //     .select('-password');
 
-//   if (!userData) {
-//     return res.status(404).json({ message: 'User not found' });
-//   }
+  //   if (!userData) {
+  //     return res.status(404).json({ message: 'User not found' });
+  //   }
 
-//   return this.success(res, { user: userData });
-// }
+  //   return this.success(res, { user: userData });
+  // }
 
 
   async refreshToken(req: Request, res: Response): Promise<Response> {
@@ -219,14 +219,14 @@ export class AuthController extends ApiController {
         const hash = bcrypt.hashSync(new_password, salt)
         await User.findOneAndUpdate({ _id: user._id }, { $set: { password: hash } })
 
-         await Operation.create({
-        username: user.username,
-        operation: "Password Change",
-        doneBy: `${user.username}`,
-        // description: `OLD status: Login=${user.isLogin}, Bet=${user.betLock}, Bet2=${user.betLock2} | NEW status: Login=${isUserActive}, Bet=${isUserBetActive}, Bet2=${isUserBet2Active}`,
+        await Operation.create({
+          username: user.username,
+          operation: "Password Change",
+          doneBy: `${user.username}`,
+          // description: `OLD status: Login=${user.isLogin}, Bet=${user.betLock}, Bet2=${user.betLock2} | NEW status: Login=${isUserActive}, Bet=${isUserBetActive}, Bet2=${isUserBet2Active}`,
 
-        description: `password change by ${user.username} !`,
-      });
+          description: `password change by ${user.username} !`,
+        });
 
         return this.success(res, { sucess: true }, 'Password updated succesfully')
       })
@@ -236,10 +236,10 @@ export class AuthController extends ApiController {
   }
 
   addTransactionPassword = async (req: Request, res: Response) => {
-    console.log(req.body,"req for olldd")
+    console.log(req.body, "req for olldd")
     try {
       const user: any = req.user
-      const { txn_password, confirm_password,  current_password, new_password } = req.body
+      const { txn_password, confirm_password, current_password, new_password } = req.body
       if (confirm_password !== new_password) {
         return this.fail(res, 'Confirm Password not matched')
       }
@@ -250,13 +250,13 @@ export class AuthController extends ApiController {
 
       const userData: any = await User.findOne({ _id: user._id });
       // Verify current password
-    const isMatch = await userData.comparePassword(current_password);
-    if (!isMatch) {
-      return res.status(400).json({
-        message: 'Current Password not matched',
-        errors: { current_password: 'Current Password not matched' }
-      });
-    }
+      const isMatch = await userData.comparePassword(current_password);
+      if (!isMatch) {
+        return res.status(400).json({
+          message: 'Current Password not matched',
+          errors: { current_password: 'Current Password not matched' }
+        });
+      }
 
 
       const salt = bcrypt.genSaltSync(10)
@@ -288,6 +288,56 @@ export class AuthController extends ApiController {
     }
   }
 
+  Auth2Factor = async (req: Request, res: Response) => {
+    try {
+      const user: any = req.user
+      const { password } = req.body
+      console.log(req.body, "Lokesh")
+
+
+      const userData: any = await User.findOne({ _id: user._id })
+
+      // return await userData.comparePassword(password).then(async (isMatch: any) => {
+      // if (!isMatch) {
+      //   return this.fail(res, 'Current Password not matched')
+      // }
+
+      const generateRandom8DigitString = (): string => {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let result = "";
+
+        for (let i = 0; i < 8; i++) {
+          const randomIndex = Math.floor(Math.random() * chars.length);
+          result += chars[randomIndex];
+        }
+
+
+
+        return result;
+      };
+
+      const otp = generateRandom8DigitString();
+
+      await User.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            tgram_ukey: otp
+          }
+        }
+      );
+
+
+
+
+
+      return this.success(res, { sucess: true },otp)
+      // })
+    } catch (e: any) {
+      return this.fail(res, e)
+    }
+  }
+
   async setTelegramBotUrl(req: Request, res: Response): Promise<any> {
     const bot_token = "8508208036:AAH-39949zXx4M1_YNEcAypSCza4BPDHWuM"
     const webhook_url = "https://api.sangamexch.com/api/telegram-webhook"
@@ -306,7 +356,7 @@ export class AuthController extends ApiController {
       const { token } = req.body
       let userExtract: any = req.user
       if (!userExtract?._id) {
-        userExtract =  AuthController.verifyToken(token)
+        userExtract = AuthController.verifyToken(token)
       }
 
       const user = await User.findOne({
@@ -376,10 +426,10 @@ export class AuthController extends ApiController {
         const token = AuthController.token(user)
         user.refreshToken = bcrypt.hashSync(user.username)
         user.sessionId = Date.now()
-        // const findMessage: any = await Setting.findOne({ name: "img_desktop" }, { value: 1 })
+          // const findMessage: any = await Setting.findOne({ name: "img_desktop" }, { value: 1 })
           // @ts-ignore
           .cache(0, 'img_desktop')
-        // const findMessage2: any = await Setting.findOne({ name: "img_mobile" }, { value: 1 })
+          // const findMessage2: any = await Setting.findOne({ name: "img_mobile" }, { value: 1 })
           // @ts-ignore
           .cache(0, 'img_mobile')
         await user.save()
@@ -446,6 +496,8 @@ export class AuthController extends ApiController {
       console.error("Error sending message:", error.response.data);
     }
   }
+
+
 
 
 }
