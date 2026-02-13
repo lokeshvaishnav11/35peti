@@ -798,11 +798,11 @@ const ListClients = () => {
                       </th> */}
                         <th>Sr</th>
                       <th>User Name</th>
-                      <th>Credit Referance</th>
+                      <th style={{textWrap:"wrap"}}>Credit Referance</th>
                       <th>Balance</th>
                       <th>Client (P/L)</th>
                       <th>Exposure</th>
-                      <th>Available Balance</th>
+                      <th style={{textWrap:"wrap"}}>Available Balance</th>
                       <th className="noExport">U St</th>
                       <th className="noExport">B St</th>
                       <th className="noExport">C.Bet</th>

@@ -303,12 +303,30 @@ const Header = () => {
                       <b>Market Analysis</b>
                     </CustomLink>
                   </li>
-                  {(userState?.user?.role == "admin" ||
-                    userParentAlldata?.paymode == "manual") && <li className='nav-item'>
-                      <CustomLink to={'/txn'}>
-                        <b>Auto</b>
-                      </CustomLink>
-                    </li>}
+
+                  <li className='nav-item dropdown'>
+                    <a>
+                      <b>All Casino Market</b> <i className='fa fa-caret-down' />
+                    </a>
+                    <ul
+                      className='dropdown-menu'
+                      aria-labelledby='navbarDropdownMenuLink'
+                      style={{ height: '400px', overflowY: 'scroll' }}
+                    >
+                      {gameList?.length > 0 &&
+                        gameList.map((Item: any, key: number) => {
+                          return (
+                            <li key={key}>
+                              <CustomLink to={`/casino/${Item.slug}`} className='dropdown-item'>
+                                <b>{Item.title}</b>
+                              </CustomLink>
+                            </li>
+                          )
+                        })}
+                    </ul>
+                  </li>
+
+
 
 
 
@@ -378,28 +396,15 @@ const Header = () => {
                         </li>
                       </ul>
                     </li>} */}
-                  <li className='nav-item dropdown'>
-                    <a>
-                      <b>All Casino Market</b> <i className='fa fa-caret-down' />
-                    </a>
-                    <ul
-                      className='dropdown-menu'
-                      aria-labelledby='navbarDropdownMenuLink'
-                      style={{ height: '400px', overflowY: 'scroll' }}
-                    >
-                      {gameList?.length > 0 &&
-                        gameList.map((Item: any, key: number) => {
-                          return (
-                            <li key={key}>
-                              <CustomLink to={`/casino/${Item.slug}`} className='dropdown-item'>
-                                <b>{Item.title}</b>
-                              </CustomLink>
-                            </li>
-                          )
-                        })}
-                    </ul>
-                  </li>
 
+
+                  {(userState?.user?.role == "admin" ||
+                    userParentAlldata?.paymode == "manual") && <li className='nav-item'>
+                      <CustomLink to={'/txn'}>
+                        <b>Auto</b>
+                      </CustomLink>
+                    </li>}
+                
                   <li className='nav-item dropdown'>
                     <a>
                       <b> All Sport Market </b> <i className='fa fa-caret-down' />
