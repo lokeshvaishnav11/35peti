@@ -146,6 +146,7 @@ class WhiteLabelController extends ApiController_1.ApiController {
             try {
                 const currentUser = req.user;
                 let whiteLabel = yield WhiteLabel_1.WhiteLabel.findOne({ userId: currentUser._id });
+                console.log(whiteLabel, "whtt");
                 if (!whiteLabel) {
                     // Create default white-label if it doesn't exist
                     whiteLabel = new WhiteLabel_1.WhiteLabel({
@@ -162,7 +163,8 @@ class WhiteLabelController extends ApiController_1.ApiController {
                     });
                     yield whiteLabel.save();
                 }
-                return this.success(res, whiteLabel);
+                // return this.success(res, whiteLabel)
+                return this.success(res, { whiteLabel });
             }
             catch (error) {
                 return this.fail(res, error.message || 'Error fetching white-label settings');

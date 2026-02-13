@@ -60,7 +60,8 @@ export const WhiteLabelProvider: React.FC<{ children: ReactNode }> = ({ children
   const loadDefaultTheme = async () => {
     try {
       const response = await whiteLabelService.getMyWhiteLabel();
-      const data = response.data.data.whiteLabel;
+      const data = response?.data?.data?.whiteLabel;
+      console.log(response.data,"resshd")
       if (data) {
         setWhiteLabel(data);
         applyTheme(data);
@@ -73,6 +74,17 @@ export const WhiteLabelProvider: React.FC<{ children: ReactNode }> = ({ children
   const applyTheme = (data?: WhiteLabelData) => {
     const themeData = data || whiteLabel;
     if (!themeData) return;
+
+    // Set theme-1 background color dynamically
+  document.documentElement.style.setProperty(
+    "--theme1-bg",
+    themeData.primaryColor
+  );
+
+  document.documentElement.style.setProperty(
+    "--theme2-bg",
+    themeData.primaryColor
+  );
 
     // Apply favicon
     if (themeData.faviconUrl) {

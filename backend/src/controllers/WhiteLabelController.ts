@@ -191,6 +191,8 @@ export class WhiteLabelController extends ApiController {
 
       let whiteLabel = await WhiteLabel.findOne({ userId: currentUser._id })
 
+      console.log(whiteLabel ,"whtt")
+
       if (!whiteLabel) {
         // Create default white-label if it doesn't exist
         whiteLabel = new WhiteLabel({
@@ -208,7 +210,9 @@ export class WhiteLabelController extends ApiController {
         await whiteLabel.save()
       }
 
-      return this.success(res, whiteLabel)
+      // return this.success(res, whiteLabel)
+      return this.success(res, {whiteLabel})
+
     } catch (error: any) {
       return this.fail(res, error.message || 'Error fetching white-label settings')
     }
