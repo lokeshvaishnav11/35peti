@@ -173,9 +173,9 @@ class WhiteLabelController extends ApiController_1.ApiController {
             try {
                 const currentUser = req.user;
                 // Only super admin can view all white-labels
-                if (currentUser.role !== Role_1.RoleType.sadmin) {
-                    return this.unauthorized(res, 'Only super admin can view all white-label setups');
-                }
+                // if (currentUser.role !== RoleType.sadmin) {
+                //   return this.unauthorized(res, 'Only super admin can view all white-label setups')
+                // }
                 const whiteLabels = yield WhiteLabel_1.WhiteLabel.find().populate('userId', 'username role fullName');
                 return this.success(res, { whiteLabels });
             }

@@ -220,9 +220,9 @@ export class WhiteLabelController extends ApiController {
       const currentUser: any = req.user
       
       // Only super admin can view all white-labels
-      if (currentUser.role !== RoleType.sadmin) {
-        return this.unauthorized(res, 'Only super admin can view all white-label setups')
-      }
+      // if (currentUser.role !== RoleType.sadmin) {
+      //   return this.unauthorized(res, 'Only super admin can view all white-label setups')
+      // }
 
       const whiteLabels = await WhiteLabel.find().populate('userId', 'username role fullName')
 

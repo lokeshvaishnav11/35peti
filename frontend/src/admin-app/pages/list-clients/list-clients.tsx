@@ -829,7 +829,7 @@ const ListClients = () => {
                       <th></th>
                       <th className="noExport"></th>
                     </tr> */}
-                    <tr> <th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>
+                    <tr> <th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>
                     {users?.items?.map((user: User, index: number) => {
                       if (
                         activeDeactive !== user.isLogin &&

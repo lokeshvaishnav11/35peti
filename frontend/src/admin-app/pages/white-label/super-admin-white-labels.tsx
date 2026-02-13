@@ -252,7 +252,7 @@ const SuperAdminWhiteLabels = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {whiteLabels.map((whiteLabel) => (
+                  {whiteLabels?.map((whiteLabel) => (
                     <tr key={whiteLabel._id}>
                       <td>{whiteLabel.companyName}</td>
                       <td>{whiteLabel.domain}</td>
