@@ -709,7 +709,7 @@ const ListClients = () => {
 
                       <button
                         type="submit"
-                        style={{ background: "#0088CC" }}
+                        // style={{ background: "#0088CC" }}
                         className="btn btn-primary ml-2"
                       >
                         Load

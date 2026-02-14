@@ -50,14 +50,14 @@ export const applyWhiteLabelSettings = (settings: any) => {
   }
   
   // Apply primary color as main theme color
-  if (settings.primaryColor) {
-    document.documentElement.style.setProperty('--primary-color', settings.primaryColor);
-  }
+  // if (settings.primaryColor) {
+  //   document.documentElement.style.setProperty('--primary-color', settings.primaryColor);
+  // }
   
   // Apply secondary color
-  if (settings.secondaryColor) {
-    document.documentElement.style.setProperty('--secondary-color', settings.secondaryColor);
-  }
+  // if (settings.secondaryColor) {
+  //   document.documentElement.style.setProperty('--secondary-color', settings.secondaryColor);
+  // }
   
   // Apply background color
   if (settings.backgroundColor) {

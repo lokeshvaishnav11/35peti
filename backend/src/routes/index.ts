@@ -127,38 +127,38 @@ router.get('/*', (req: Request, res: Response) => {
       }
       
       // Add CSS variables for theme colors
-      const themeStyles = `
-      <style id="white-label-theme">
-        :root {
-          --primary-color: ${req.whiteLabel.primaryColor || '#007bff'};
-          --secondary-color: ${req.whiteLabel.secondaryColor || '#6c757d'};
-          --background-color: ${req.whiteLabel.backgroundColor || '#ffffff'};
-          --text-color: ${req.whiteLabel.textColor || '#212529'};
-          --font-family: '${req.whiteLabel.fontFamily || 'Arial, sans-serif'}';
-        }
+      // const themeStyles = `
+      // <style id="white-label-theme">
+      //   :root {
+      //     --primary-color: ${req.whiteLabel.primaryColor || '#007bff'};
+      //     --secondary-color: ${req.whiteLabel.secondaryColor || '#6c757d'};
+      //     --background-color: ${req.whiteLabel.backgroundColor || '#ffffff'};
+      //     --text-color: ${req.whiteLabel.textColor || '#212529'};
+      //     --font-family: '${req.whiteLabel.fontFamily || 'Arial, sans-serif'}';
+      //   }
         
-        body {
-          background-color: var(--background-color) !important;
-          color: var(--text-color) !important;
-          font-family: var(--font-family) !important;
-        }
+      //   body {
+      //     background-color: var(--background-color) !important;
+      //     color: var(--text-color) !important;
+      //     font-family: var(--font-family) !important;
+      //   }
         
-        .btn-primary, button.btn-primary {
-          background-color: var(--primary-color) !important;
-          border-color: var(--primary-color) !important;
-        }
+      //   .btn-primary, button.btn-primary {
+      //     background-color: var(--primary-color) !important;
+      //     border-color: var(--primary-color) !important;
+      //   }
         
-        .btn-secondary {
-          background-color: var(--secondary-color) !important;
-          border-color: var(--secondary-color) !important;
-        }
-      </style>`;
+      //   .btn-secondary {
+      //     background-color: var(--secondary-color) !important;
+      //     border-color: var(--secondary-color) !important;
+      //   }
+      // </style>`;
       
       // Insert the theme styles after the opening head tag
-      customizedHtml = customizedHtml.replace(
-        /<head>/,
-        `<head>${themeStyles}`
-      );
+      // customizedHtml = customizedHtml.replace(
+      //   /<head>/,
+      //   `<head>${themeStyles}`
+      // );
       
       res.send(customizedHtml);
     });

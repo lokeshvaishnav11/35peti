@@ -81,9 +81,14 @@ export const WhiteLabelProvider: React.FC<{ children: ReactNode }> = ({ children
     themeData.primaryColor
   );
 
+  // document.documentElement.style.setProperty(
+  //   "--theme2-bg",
+  //   themeData.primaryColor
+  // );
+
   document.documentElement.style.setProperty(
-    "--theme2-bg",
-    themeData.primaryColor
+    "--primary-color",
+    themeData.textColor
   );
 
     // Apply favicon
@@ -103,13 +108,7 @@ export const WhiteLabelProvider: React.FC<{ children: ReactNode }> = ({ children
     const style = document.createElement('style');
     style.id = 'white-label-css';
     style.innerHTML = `
-      :root {
-        --primary-color: ${themeData.primaryColor};
-        --secondary-color: ${themeData.secondaryColor};
-        --background-color: ${themeData.backgroundColor};
-        --text-color: ${themeData.textColor};
-        --font-family: ${themeData.fontFamily};
-      }
+     
       
       body {
         background-color: var(--background-color);
@@ -118,23 +117,17 @@ export const WhiteLabelProvider: React.FC<{ children: ReactNode }> = ({ children
       }
       
       .btn-primary {
-        background-color: var(--primary-color);
+        background-color: var(--theme1-bg);
         border-color: var(--primary-color);
       }
       
       .btn-primary:hover {
-        background-color: color-mix(in srgb, var(--primary-color) 90%, black);
-        border-color: color-mix(in srgb, var(--primary-color) 90%, black);
+        background-color: var(--theme1-bg);
+        border-color: var(--primary-color);
       }
+
       
-      a {
-        color: var(--primary-color);
-      }
-      
-      a:hover {
-        color: color-mix(in srgb, var(--primary-color) 90%, black);
-      }
-      
+     
       ${themeData.customCSS || ''}
     `;
     document.head.appendChild(style);

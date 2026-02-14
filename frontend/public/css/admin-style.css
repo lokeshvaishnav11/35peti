@@ -883,7 +883,7 @@ input + .slider span:last-child {
 .custom-tabs .nav-link {
   border: none;
   background: transparent;
-  color: #ffffff !important; /* white text */
+  /* color: #ffffff !important; white text */
   font-weight: 500;
   margin-right: 10px;
 }
@@ -914,7 +914,7 @@ input + .slider span:last-child {
 .navbar > .show > a:focus,
 .navbar > .show > a:hover {
   color: #ffffff !important;
-  background: #007bff !important; /* blue background */
+  background: var(--theme1-bg) !important; /* blue background */
   outline: 0;
 }
 
