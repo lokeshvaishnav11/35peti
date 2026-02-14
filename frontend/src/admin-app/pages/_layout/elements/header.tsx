@@ -464,11 +464,11 @@ const Header = () => {
                           </CustomLink>
                         </li>}
 
-                      <li>
+                   { userState.user.role === RoleType.admin  &&  <li>
                         <CustomLink to='/update-tv' className='dropdown-item'>
                           <b>{'Mange -TV'}</b>
                         </CustomLink>
-                      </li>
+                      </li>}
                       {/* <li>
                         <CustomLink to='/white-label' className='dropdown-item'>
                           <b>{'White-Label'}</b>
