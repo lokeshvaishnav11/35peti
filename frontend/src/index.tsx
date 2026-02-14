@@ -16,11 +16,11 @@ if (rootElement) {
   const root = createRoot(rootElement);
   root.render(
     <Suspense
-      fallback={
-        <div className='suspense-loading'>
-          <img src='/imgs/logo.png' width={200} />
-        </div>
-      }
+      // fallback={
+      //   <div className='suspense-loading'>
+      //     <img src='/imgs/logo.png' width={200} />
+      //   </div>
+      // }
     >
       <Provider store={store}>
         <WhiteLabelProvider>

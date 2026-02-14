@@ -108,6 +108,10 @@ class UserService {
    VerifyOtp(data:any){
     return api.post('/disable-telegram-otp', data)
   }
+
+  VerifyOtptwo(data:any){
+    
+  }
 }
 
 export default new UserService()

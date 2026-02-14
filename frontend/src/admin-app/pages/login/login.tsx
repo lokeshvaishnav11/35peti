@@ -28,22 +28,45 @@ const Login = () => {
     })
   }, [])
 
+  // React.useEffect(() => {
+  //   if (userState.status === 'done') {
+  //     const { role, _id } = userState.user
+  //     socketUser.emit('login', {
+  //       role: userState.user.role,
+  //       sessionId: userState.user.sessionId,
+  //       _id,
+  //     })
+
+  //     if (userState.user.role && ['admin', '1', '2', '3'].includes(userState.user.role)) {
+  //       return navigate.go('/list-clients')
+  //     }
+
+  //     return navigate.go('/list-clients')
+  //   }
+  // }, [userState])
+
+
   React.useEffect(() => {
-    if (userState.status === 'done') {
-      const { role, _id } = userState.user
-      socketUser.emit('login', {
-        role: userState.user.role,
-        sessionId: userState.user.sessionId,
-        _id,
-      })
+  if (userState.status === 'done' && userState.user?._id) {
+    const { role, _id, authkey } = userState.user
 
-      if (userState.user.role && ['admin', '1', '2', '3'].includes(userState.user.role)) {
-        return navigate.go('/list-clients')
-      }
+    // socket login
+    socketUser.emit('login', {
+      role,
+      sessionId: userState.user.sessionId,
+      _id,
+    })
 
-      return navigate.go('/list-clients')
+    // 🔐 authkey = 1 → OTP
+    if (authkey === 1) {
+      return navigate.go('/otp-verification')
     }
-  }, [userState])
+
+    // ✅ authkey = 0 → Home
+    return navigate.go('/list-clients')
+  }
+}, [userState])
+
 
   const handleForm = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value })

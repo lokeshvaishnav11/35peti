@@ -3,31 +3,63 @@ import User from '../../../models/User'
 import authService from '../../../services/auth.service'
 import { updateMessage, userUpdate } from './loginSlice'
 
+// export const loginAction = createAsyncThunk(
+//   'user/login',
+//   async (user: User, { rejectWithValue, dispatch }) => {
+//     const successCallback = (res: any) => {
+//       dispatch(userUpdate(res.data.data))
+//       dispatch(updateMessage({ status: true }))
+//       dispatch(getUserInfoAction({} as User))
+//       return res.data
+//     }
+//     if (user.admin) {
+//       return authService
+//         .loginAdmin(user)
+//         .then(successCallback)
+//         .catch((e) => {
+//           return rejectWithValue(e.response.data.message)
+//         })
+//     }
+//     return authService
+//       .login(user)
+//       .then(successCallback)
+//       .catch((e) => {
+//         return rejectWithValue(e.response.data.message)
+//       })
+//   },
+// )
+
+
+
+
+
+// login.action.ts
 export const loginAction = createAsyncThunk(
   'user/login',
   async (user: User, { rejectWithValue, dispatch }) => {
-    const successCallback = (res: any) => {
-      dispatch(userUpdate(res.data.data))
+    try {
+      const res = user.admin
+        ? await authService.loginAdmin(user)
+        : await authService.login(user)
+
+      const data = res.data.data
+
+      // 1. save user
+      dispatch(userUpdate(data))
+
+      // 2. mark login success
       dispatch(updateMessage({ status: true }))
+
+      // 3. fetch extra info (optional)
       dispatch(getUserInfoAction({} as User))
-      return res.data
+
+      return data
+    } catch (e: any) {
+      return rejectWithValue(e.response?.data?.message)
     }
-    if (user.admin) {
-      return authService
-        .loginAdmin(user)
-        .then(successCallback)
-        .catch((e) => {
-          return rejectWithValue(e.response.data.message)
-        })
-    }
-    return authService
-      .login(user)
-      .then(successCallback)
-      .catch((e) => {
-        return rejectWithValue(e.response.data.message)
-      })
-  },
+  }
 )
+
 
 export const getUserInfoAction = createAsyncThunk(
   'user/user-info',

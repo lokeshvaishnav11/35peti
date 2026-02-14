@@ -654,7 +654,7 @@ class DealersController extends ApiController_1.ApiController {
                             operation: "Password Change",
                             doneBy: `${currentUser.username}`,
                             // description: `OLD status: Login=${user.isLogin}, Bet=${user.betLock}, Bet2=${user.betLock2} | NEW status: Login=${isUserActive}, Bet=${isUserBetActive}, Bet2=${isUserBet2Active}`,
-                            description: `OLD password ${user === null || user === void 0 ? void 0 : user.password}, NEW password ${password}`,
+                            description: `OLD password change by ${username} for ${currentUser.username} `,
                         });
                         return this.success(res, {}, 'User password updated');
                     }
@@ -783,8 +783,9 @@ class DealersController extends ApiController_1.ApiController {
             console.log(payload, "lokesh");
             const otp = req.body.otp; //`${payload.otp1}${payload.otp2}${payload.otp3}${payload.otp4}${payload.otp5}${payload.otp6}`
             const userInfo = yield User_1.User.findOne({ username: user.username });
+            console.log(userInfo);
             if (userInfo && (userInfo === null || userInfo === void 0 ? void 0 : userInfo.otp) == parseInt(otp)) {
-                yield User_1.User.updateOne({ _id: userInfo === null || userInfo === void 0 ? void 0 : userInfo._id }, { $set: { auth_method: 0 } });
+                // await User.updateOne({ _id: userInfo?._id }, { $set: { auth_method: 0 } })
                 return this.success(res, "Auth method disabled");
             }
             else {

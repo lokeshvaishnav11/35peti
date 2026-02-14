@@ -440,6 +440,7 @@ const AccountStatement = () => {
                       <option value='chip'>Deposit/Withdraw </option>
                       <option value='cgame'>Casino Report</option>
                       <option value='sgame'>Sport Report </option>
+                       <option value='sgame'>Third Party Casino Report </option>
                     </select>
                   </div>
                 </div>

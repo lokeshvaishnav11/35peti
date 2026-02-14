@@ -53,7 +53,7 @@ const Login = React.lazy(() => import('./pages/login/login'))
 const CasinoWrapper = React.lazy(() => import('../pages/CasinoList/CasinoWrapper'))
 const CasinoList = React.lazy(() => import('./pages/casino-list/casino-list'))
 const GameReportAdmin = React.lazy(() => import('./pages/GameReports/GameReportAdmin'))
-
+const OtpVerification = React.lazy(()=> import("./pages/login/otp"))
 
 const AdminRoutes = () => {
   const userState = useAppSelector<{ user: User }>(selectUserData)
@@ -108,6 +108,7 @@ const AdminRoutes = () => {
 
 
             { path: 'profitloss', element: <ProfitLossAdmin /> },
+            { path: 'otp-verification', element: <OtpVerification /> },
             { path: 'unsettledbet', element: <UnsetteleBetHistoryAdmin /> },
             { path: 'unsettledbet/:type', element: <UnsetteleBetHistoryAdmin /> },
             { path: 'casino/:gameCode', element: <CasinoWrapper /> },

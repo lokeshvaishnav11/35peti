@@ -61,6 +61,7 @@ class AuthController extends ApiController_1.ApiController {
                             username: user.username,
                             role: user.role,
                             _id: user._id,
+                            authkey: user.auth_method
                         });
                     }
                     return this.fail(res, 'The email or password are incorrect!');

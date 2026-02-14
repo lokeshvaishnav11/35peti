@@ -465,6 +465,61 @@ const ListClients = () => {
     const finalE = parseFloat(ex) + +parseFloat(cex);
     return finalE.toFixed(2);
   };
+
+  const th: React.CSSProperties = {
+  padding: "6px",
+  border: "1px solid #ddd",
+  whiteSpace: "nowrap",
+  fontSize: "12px",
+};
+
+// const td: React.CSSProperties = {
+//   padding: "6px",
+//   border: "1px solid #ddd",
+//   textAlign: "center",
+//   fontSize: "12px",
+// };
+
+// const action: React.CSSProperties = {
+//   padding: "2px 6px",
+//   margin: "0 2px",
+//   border: "1px solid #333",
+//   cursor: "pointer",
+//   fontSize: "11px",
+//   display: "inline-block",
+// };
+
+const td: React.CSSProperties = {
+  padding: "6px",
+  border: "1px solid #ddd",
+  textAlign: "center",
+  verticalAlign: "middle",
+};
+
+const action: React.CSSProperties = {
+  border: "1px solid #333",
+  padding: "2px 6px",
+  margin: "0 2px",
+  cursor: "pointer",
+  fontSize: "11px",
+  display: "inline-block",
+};
+
+
+const actionBtn: React.CSSProperties = {
+  background: "#2f2f2f",
+  color: "#fff",
+  padding: "3px 7px",
+  margin: "0 2px",
+  fontSize: "11px",
+  borderRadius: "3px",
+  cursor: "pointer",
+  display: "inline-block",
+  minWidth: "22px",
+  textAlign: "center",
+};
+
+
   return (
     <>
       <div className="container-fluid">
@@ -777,241 +832,220 @@ const ListClients = () => {
                   )}
                 </Pdf>
               </p>
-              <div
-                className="table-responsive data-table"
-                style={{ zoom: "0.75" }}
-                ref={ref}
-              >
-                <table
-                  id="clientListTable"
-                  className="table table-striped  table-bordered "
-                  style={{ width: "100%" }}
-                >
-                  <thead>
-                    <tr>
-                      {/* <th>
-                        <input
-                          type={'checkbox'}
-                          checked={selectAll || false}
-                          onChange={handleSelectAll}
-                        />
-                      </th> */}
-                        <th>Sr</th>
-                      <th>User Name</th>
-                      <th style={{textWrap:"wrap"}}>Credit Referance</th>
-                      <th>Balance</th>
-                      <th>Client (P/L)</th>
-                      <th>Exposure</th>
-                      <th style={{textWrap:"wrap"}}>Available Balance</th>
-                      <th className="noExport">U St</th>
-                      <th className="noExport">B St</th>
-                      <th className="noExport">C.Bet</th>
-                      <th>Exposure Limit</th>
-                      <th>Default %</th>
-                      <th>Account Type</th>
-                       <th>Sr</th>
-                      <th className="noExport">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {/* <tr>
-                       <th></th>
-                      <th>Total</th>
-                      <th>{usersTotal.totalcr.toFixed(2)}</th>
-                      <th>{usersTotal.totalbalance.toFixed(2)}</th>
-                      <th>{usersTotal.clientpl.toFixed(2)}</th>
-                      <th>{usersTotal.totalExposer.toFixed(2)}</th>
-                      <th>{usersTotal.avl.toFixed(2)}</th>
-                      <th className="noExport"></th>
-                      <th className="noExport"></th>
-                      <th></th>
-                      <th></th>
-                      <th></th>
-                      <th className="noExport"></th>
-                    </tr> */}
-                    <tr> <th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>
-                    {users?.items?.map((user: User, index: number) => {
-                      if (
-                        activeDeactive !== user.isLogin &&
-                        user.role !== RoleType.admin
-                      )
-                        return null;
-                      return (
-                        <tr key={user._id}>
-                          {/* <td>
-                            <input
-                              type={'checkbox'}
-                              checked={user.selected || false}
-                              onChange={() => handleSelectItem?.(user)}
-                            />
-                          </td> */}
-                           <td>
-                            {index +1}
-                          </td>
-                          <td>
-                            {user.role !== RoleType.user && (
-                              <CustomLink to={`/list-clients/${user.username}`}>
-                                {user.username}
-                              </CustomLink>
-                            )}
-                            {user.role === RoleType.user && (
-                              <a className="">{user.username}</a>
-                            )}
-                          </td>
-                          <td>
-                            {user?.creditRefrences ? user.creditRefrences : 0}
-                          </td>
-                          <td>{mainBalance(user)}</td>
-                          <td
-                            className={
-                              user?.balance?.profitLoss &&
-                              user?.balance?.profitLoss > 0
-                                ? ""
-                                : ""
-                            }
-                          >
-                            {user?.balance?.profitLoss?.toFixed(2) || 0}
-                          </td>
-                          <td>{finalExposer(user?.balance)}</td>
-                          <td>
-                            {(
-                              (user.balance?.balance || 0) -
-                              (user.balance?.exposer || 0) -
-                              (user.balance?.casinoexposer || 0)
-                            ).toFixed(2)}
-                          </td>
-                          <td>
-                            {user.role !== RoleType.admin && (
-                              <input
-                                className="form-control"
-                                type="checkbox"
-                                name={"U St"}
-                                checked={user?.isLogin}
-                                onChange={() =>
-                                  updateStatus(index, !user?.isLogin, "user")
-                                }
-                              />
-                            )}
-                          </td>
-                          <td>
-                            {user.role !== RoleType.admin && (
-                              <input
-                                className="form-control"
-                                type="checkbox"
-                                name={"B St"}
-                                checked={user?.betLock}
-                                onChange={() =>
-                                  updateStatus(index, !user?.betLock, "bet")
-                                }
-                              />
-                            )}
-                          </td>
-                          <td>
-                            {user.role !== RoleType.admin && (
-                              <input
-                                className="form-control"
-                                type="checkbox"
-                                name={"B2 St"}
-                                checked={user?.betLock2}
-                                onChange={() =>
-                                  updateStatus(index, !user?.betLock2, "bet2")
-                                }
-                              />
-                            )}
-                          </td>
-                          <td>{user.exposerLimit ? user.exposerLimit : 0}</td>
-                          <td>{getcurrentpartnership(user)}</td>
-                          <td>{RoleName[user.role!]}</td>
-                           <td>
-                            {index +1}
-                          </td>
-                          <td>
-                            <a
-                              onClick={() => {
-                                openModal("d");
-                                getUserDetail(user);
-                              }}
-                            >
-                              D
-                            </a>
-                            <a
-                              onClick={() => {
-                                openModal("w");
-                                getUserDetail(user);
-                              }}
-                            >
-                              W
-                            </a>
+           <div style={{ width: "100%", overflowX: "auto" }}>
+  <table style={{ width: "100%", borderCollapse: "collapse" }}>
+    <thead>
+      <tr style={{ background: "#f1f1f1", fontSize: "12px" }}>
+        <th style={th}>Sr</th>
+          <th style={th}>User</th>
+        <th style={th}>Credit Ref</th>
+        <th style={th}>Balance</th>
+        <th style={th}>Client (P/L)</th>
+        <th style={th}>Exposure</th>
+        <th style={th}>Available</th>
+        <th style={th}>U St</th>
+        <th style={th}>B St</th>
+         <th style={th}>C bet</th>
+        <th style={th}> EX Limit</th>
+         <th style={th}>Default</th>
+        <th style={th}>Type</th>
+         <th style={th}>Sr</th>
+        <th style={th}>Action</th>
+      </tr>
+    </thead>
 
-                            {isAdmin(user) && user.role !== RoleType.admin && (
-                              <a
-                                onClick={() => {
-                                  openModal("e");
-                                  getUserDetail(user);
-                                  setModalType("EXP");
-                                }}
-                              >
-                                L
-                              </a>
-                            )}
-                            {isAdmin(user) && user.role !== RoleType.admin && (
-                              <a
-                                onClick={() => {
-                                  openModal("e");
-                                  getUserDetail(user);
-                                  setModalType("CRD");
-                                }}
-                              >
-                                C
-                              </a>
-                            )}
-                            {isAdmin(user) && user.role !== RoleType.admin && (
-                              <a
-                                onClick={() => {
-                                  openModal("p");
-                                  getUserDetail(user);
-                                }}
-                              >
-                                P
-                              </a>
-                            )}
-                            {isAdmin(user) && user.role !== RoleType.admin && (
-                              <a
-                                onClick={() => {
-                                  openModal("s");
-                                  getUserDetail(user);
-                                }}
-                              >
-                                S
-                              </a>
-                            )}
-                            {isAdmin(user) && (
-                              <a
-                                onClick={() => {
-                                  openModal("gs");
-                                  getUserDetail(user);
-                                }}
-                              >
-                                GS
-                              </a>
-                            )}
-                            {isAdmin(user) && (
-                              <a
-                                className="d-none"
-                                onClick={() => {
-                                  resetTxnPassword(user);
-                                }}
-                              >
-                                T
-                              </a>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+    {/* <tbody>
+      {users?.items?.map((user: User, index: number) => {
+        if (
+          activeDeactive !== user.isLogin &&
+          user.role !== RoleType.admin
+        ) return null;
+
+        const available =
+          ((user.balance?.balance || 0) -
+            (user.balance?.exposer || 0) -
+            (user.balance?.casinoexposer || 0)).toFixed(2);
+
+        return (
+          <tr
+            key={user._id}
+            style={{
+              borderBottom: "1px solid #ddd",
+              fontSize: "12px",
+            }}
+          >
+            <td style={td}><strong>{user.username}</strong></td>
+            <td style={td}>{user.creditRefrences || 0}</td>
+            <td style={td}>{mainBalance(user)}</td>
+            <td style={td}>{user.balance?.profitLoss?.toFixed(2) || 0}</td>
+            <td style={td}>{finalExposer(user.balance)}</td>
+            <td style={td}>{available}</td>
+
+            <td style={td}>
+              <input
+                type="checkbox"
+                checked={user.isLogin}
+                onChange={() =>
+                  updateStatus(index, !user.isLogin, "user")
+                }
+              />
+            </td>
+
+            <td style={td}>
+              <input
+                type="checkbox"
+                checked={user.betLock}
+                onChange={() =>
+                  updateStatus(index, !user.betLock, "bet")
+                }
+              />
+            </td>
+
+            <td style={td}>{user.exposerLimit || 0}</td>
+            <td style={td}>{RoleName[user.role!]}</td>
+
+            <td style={td}>
+              <span style={action} onClick={() => { openModal("d"); getUserDetail(user); }}>D</span>
+              <span style={action} onClick={() => { openModal("w"); getUserDetail(user); }}>W</span>
+              {isAdmin(user) && (
+                <>
+                  <span style={action} onClick={() => { openModal("p"); getUserDetail(user); }}>P</span>
+                  <span style={action} onClick={() => { openModal("s"); getUserDetail(user); }}>S</span>
+                </>
+              )}
+            </td>
+          </tr>
+        );
+      })}
+    </tbody> */}
+
+    <tbody>
+  {users?.items?.map((user: User, index: number) => {
+    if (
+      activeDeactive !== user.isLogin &&
+      user.role !== RoleType.admin
+    ) return null;
+
+    const available =
+      ((user.balance?.balance || 0) -
+        (user.balance?.exposer || 0) -
+        (user.balance?.casinoexposer || 0)).toFixed(2);
+
+    return (
+      <tr key={user._id}  style={{
+    fontSize: "12px",
+    background: index % 2 === 0 ? "#f5f5f5" : "#ffffff",
+  }}>
+        {/* Sr */}
+        <td style={td}>{index + 1}</td>
+
+        {/* Username with block */}
+        <td style={td}>
+          <span
+            style={{
+              background: "#444",
+              color: "#fff",
+              padding: "3px 6px",
+              borderRadius: "3px",
+              fontSize: "11px",
+              display: "inline-block",
+            }}
+          >
+            {user.username}
+          </span>
+        </td>
+
+        {/* Credit Reference */}
+        <td style={td}>{user.creditRefrences || 0}</td>
+
+        {/* Balance */}
+        <td style={td}>{mainBalance(user)}</td>
+
+        {/* Client P/L */}
+        <td style={td}>
+          {user.balance?.profitLoss?.toFixed(2) || 0}
+        </td>
+
+        {/* Exposure */}
+        <td style={td}>{finalExposer(user.balance)}</td>
+
+        {/* Available */}
+        <td style={td}>{available}</td>
+
+        {/* U St */}
+        <td style={td}>
+          {user.role !== RoleType.admin && (
+            <input
+              type="checkbox"
+              checked={user.isLogin}
+              onChange={() =>
+                updateStatus(index, !user.isLogin, "user")
+              }
+            />
+          )}
+        </td>
+
+        {/* B St */}
+        <td style={td}>
+          {user.role !== RoleType.admin && (
+            <input
+              type="checkbox"
+              checked={user.betLock}
+              onChange={() =>
+                updateStatus(index, !user.betLock, "bet")
+              }
+            />
+          )}
+        </td>
+
+        {/* C Bet */}
+        <td style={td}>
+          {user.role !== RoleType.admin && (
+            <input
+              type="checkbox"
+              checked={user.betLock2}
+              onChange={() =>
+                updateStatus(index, !user.betLock2, "bet2")
+              }
+            />
+          )}
+        </td>
+
+        {/* Exposure Limit */}
+        <td style={td}>{user.exposerLimit || 0}</td>
+
+        {/* Default % */}
+        <td style={td}>{getcurrentpartnership(user)}</td>
+
+        {/* Account Type */}
+        <td style={td}>{RoleName[user.role!]}</td>
+
+        {/* Sr Again */}
+        <td style={td}>{index + 1}</td>
+
+        {/* Actions */}
+        <td style={td}>
+  <span style={actionBtn} onClick={() => { openModal("d"); getUserDetail(user); }}>D</span>
+  <span style={actionBtn} onClick={() => { openModal("w"); getUserDetail(user); }}>W</span>
+
+  {isAdmin(user) && (
+    <>
+      <span style={actionBtn} onClick={() => { openModal("p"); getUserDetail(user); }}>P</span>
+      <span style={actionBtn} onClick={() => { openModal("s"); getUserDetail(user); }}>S</span>
+      <span style={actionBtn} onClick={() => { openModal("gs"); getUserDetail(user); }}>GS</span>
+    </>
+  )}
+</td>
+
+      </tr>
+    );
+  })}
+</tbody>
+
+  </table>
+</div>
+
+
               <ReactPaginate
                 breakLabel="..."
                 nextLabel=">>"
